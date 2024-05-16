@@ -1,10 +1,7 @@
 "use client";
 import React, { useState } from "react";
 
-export default function CandidateDetails({
-  setCandidateDetailsValid,
-  handleCandidateData,
-}) {
+export default function CandidateDetails() {
   const [categoryCertificate, setCategoryCertificate] = useState(null);
   const [validFields, setValidFields] = useState({
     first_name: "",
@@ -64,129 +61,37 @@ export default function CandidateDetails({
     } else {
       setCategoryCertificateError("");
       setCategoryCertificate(null);
+      validateForm();
     }
-    validateForm();
   };
 
   const handleRemoveFile = () => {
     setCategoryCertificate(null);
-    validateForm();
-  };
-
-  const validateName = (name) => {
-    return /^[A-Za-z]+$/.test(name);
-  };
-
-  const validateContact = (contact) => {
-    return /^[0-9]{10}$/.test(contact);
-  };
-
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const validateDOB = (dob) => {
-    const currentDate = new Date();
-    const inputDate = new Date(dob);
-    return inputDate <= currentDate && inputDate.getFullYear() <= 2023;
-  };
-
-  const validateForm = () => {
-    const requiredFieldsValid =
-      validFields.first_name &&
-      validFields.surname &&
-      validFields.father_first_name &&
-      validFields.mother_first_name &&
-      validFields.legible_postal_address &&
-      validFields.legible_contact &&
-      validFields.legible_email &&
-      validFields.dob;
-
-    const optionalFieldsValid =
-      !validFields.middle_name ||
-      (validFields.middle_name &&
-        validateName(validFields.middle_name) &&
-        (!validFields.father_middle_name ||
-          (validFields.father_middle_name &&
-            validateName(validFields.father_middle_name))) &&
-        (!validFields.mother_middle_name ||
-          (validFields.mother_middle_name &&
-            validateName(validFields.mother_middle_name))));
-
-    const categoryValid = category !== "";
-    const regionValid = region !== "";
-
-    let categoryCertificateValid = true;
-    if (category !== "General") {
-      categoryCertificateValid = categoryCertificate !== null;
-    }
-
-    const valid =
-      requiredFieldsValid &&
-      optionalFieldsValid &&
-      categoryValid &&
-      regionValid &&
-      categoryCertificateValid;
-
-    setCandidateDetailsValid(valid);
-
-    if (true) {
-      console.log("Candidate Details Validated!");
-      handleCandidateData({
-        first_name: validFields.first_name,
-        middle_name: validFields.middle_name,
-        surname: validFields.surname,
-        father_first_name: validFields.father_first_name,
-        father_middle_name: validFields.father_middle_name,
-        father_surname: validFields.father_surname,
-        mother_first_name: validFields.mother_first_name,
-        mother_middle_name: validFields.mother_middle_name,
-        mother_surname: validFields.mother_surname,
-        legible_postal_address: validFields.legible_postal_address,
-        legible_contact: validFields.legible_contact,
-        legible_email: validFields.legible_email,
-        dob: validFields.dob,
-        region: region,
-        category: category,
-        // categoryCertificate,
-      });
-    } else {
-      console.log("Invalid!");
-    }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    let isValid = true;
-
-    if (
-      name === "first_name" ||
-      name === "surname" ||
-      name === "middle_name" ||
-      name === "father_first_name" ||
-      name === "father_middle_name" ||
-      name === "father_surname" ||
-      name === "mother_first_name" ||
-      name === "mother_middle_name" ||
-      name === "mother_surname"
-    ) {
-      isValid = validateName(value);
-    } else if (name === "legible_postal_address") {
-      isValid = value.trim() !== "";
-    } else if (name === "legible_contact") {
-      isValid = validateContact(value);
-    } else if (name === "legible_email") {
-      isValid = validateEmail(value);
-    } else if (name === "dob") {
-      isValid = validateDOB(value);
-    }
-
-    setValidFields({
-      ...validFields,
-      [name]: isValid ? value : null,
-    });
-
+    setValidFields((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
     validateForm();
+  };
+
+  const validateForm = () => {
+    if (
+      Object.values(validFields).every((field) => field !== "") &&
+      category !== "" &&
+      region !== ""
+    ) {
+      handleCandidateData({
+        ...validFields,
+        category,
+        region,
+        categoryCertificate:
+          category !== "General" ? categoryCertificate : null,
+      });
+    }
   };
 
   return (
@@ -540,7 +445,7 @@ export default function CandidateDetails({
             name="region"
             id="outside_delhi"
             value="Outside Delhi"
-            checked={region === "OutsideDelhi"}
+            checked={region === "Outside Delhi"}
             onChange={handleRegionChange}
           />
           <label htmlFor="outside_delhi" className="ml-2">

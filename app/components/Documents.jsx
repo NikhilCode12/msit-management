@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-const Documents = ({ setDocumentsValid, handleDocumentsData }) => {
+const Documents = () => {
   const [files, setFiles] = useState({
     "10th_marksheet": null,
     "12th_marksheet": null,
@@ -52,15 +52,6 @@ const Documents = ({ setDocumentsValid, handleDocumentsData }) => {
   });
 
   useEffect(() => {
-    const isFormFilled = Object.values(formValues).every(
-      (value) => value !== ""
-    );
-
-    const areDocumentsUploaded =
-      files["10th_marksheet"] !== null &&
-      files["12th_marksheet"] !== null &&
-      (formValues.university === "" || files["diploma_certificate"] !== null);
-
     if (!files["10th_marksheet"])
       setMarksheetError_10(
         "Please upload 10th Marksheet and Passing Certificate."
@@ -78,55 +69,7 @@ const Documents = ({ setDocumentsValid, handleDocumentsData }) => {
         "Please upload Diploma Marksheet and Passing Certificate."
       );
     else setDiplomaCertificateError("");
-
-    if (isFormFilled /*&& areDocumentsUploaded */) {
-      console.log("Documents are valid now!");
-      handleDocumentsData({
-        board,
-        roll_no,
-        year,
-        subject_1,
-        subject_2,
-        subject_3,
-        subject_4,
-        subject_5,
-        subject_6,
-        total_marks,
-        total_percentage,
-        board_12,
-        roll_no_12,
-        year_12,
-        subject_1_12,
-        subject_2_12,
-        subject_3_12,
-        subject_4_12,
-        subject_5_12,
-        subject_6_12,
-        total_marks_12,
-        total_percentage_12,
-        university,
-        roll_no_university,
-        subjects_1st_year,
-        t_m_1,
-        m_o_1,
-        p_1,
-        subjects_2nd_year,
-        t_m_2,
-        m_o_2,
-        p_2,
-        subjects_3rd_year,
-        t_m_3,
-        m_o_3,
-        p_3,
-
-        // ...files,
-      });
-      setDocumentsValid(true);
-    } else {
-      console.log("Documents are invalid now!");
-      setDocumentsValid(false);
-    }
-  }, [formValues, files, setDocumentsValid, handleDocumentsData]);
+  }, [formValues, files]);
 
   const handleFileUpload = (e, type) => {
     const file = e.target.files[0];

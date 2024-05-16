@@ -1,9 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
-const ProgrammeDetails = ({
-  setProgrammeDetailsValid,
-  handleProgrammeData,
-}) => {
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+const ProgrammeDetails = ({ formData, setFormData }) => {
   const [programmeName, setProgrammeName] = useState("");
   const [stream, setStream] = useState("");
   const [shift, setShift] = useState("");
@@ -17,16 +14,6 @@ const ProgrammeDetails = ({
   const [admitCardError, setAdmitCardError] = useState("");
 
   useEffect(() => {
-    const isValid =
-      programmeName &&
-      stream &&
-      shift &&
-      appNo &&
-      regDate &&
-      registrationForm &&
-      admitCard;
-    setProgrammeDetailsValid(isValid);
-
     if (!registrationForm) {
       setRegistrationFormError("Please upload GGSIPU Registration Form.");
     } else {
@@ -38,50 +25,58 @@ const ProgrammeDetails = ({
     } else {
       setAdmitCardError("");
     }
+  }, [registrationForm, admitCard]);
 
-    if (isValid) {
-      console.log("Programme Details Valid!");
-      handleProgrammeData({
-        programmeName,
-        stream,
-        shift,
-        appNo,
-        regDate,
-        rollNo,
-        rank,
-        // registrationForm,
-        // admitCard,
-      });
-    } else {
-      console.log("Programme Details Invalid!");
-    }
-  }, [
-    programmeName,
-    stream,
-    shift,
-    appNo,
-    regDate,
-    registrationForm,
-    admitCard,
-    setProgrammeDetailsValid,
-    handleProgrammeData,
-  ]);
+  const handleProgrammeSelect = useCallback((e) => {
+    setProgrammeName(e.target.value);
+  }, []);
 
-  const handleProgrammeSelect = (e) => setProgrammeName(e.target.value);
-  const handleStreamSelect = (e) => setStream(e.target.value);
-  const handleShiftSelect = (e) => setShift(e.target.value);
-  const handleApplicationNo = (e) => setAppNo(e.target.value);
-  const handleRegistrationDate = (e) => setRegDate(e.target.value);
-  const handleRollNo = (e) => setRollNo(e.target.value);
-  const handleRank = (e) => setRank(e.target.value);
-  const handleRegistrationFormUpload = (e) =>
-    setRegistrationForm(e.target.files[0]);
-  const handleAdmitCardUpload = (e) => setAdmitCard(e.target.files[0]);
-  const handleRegistrationFormRemove = () => setRegistrationForm(null);
-  const handleAdmitCardRemove = () => setAdmitCard(null);
+  const handleStreamSelect = useCallback((e) => setStream(e.target.value), []);
+  const handleShiftSelect = useCallback((e) => setShift(e.target.value), []);
+  const handleApplicationNo = useCallback((e) => setAppNo(e.target.value), []);
+  const handleRegistrationDate = useCallback(
+    (e) => setRegDate(e.target.value),
+    []
+  );
+  const handleRollNo = useCallback((e) => setRollNo(e.target.value), []);
+  const handleRank = useCallback((e) => setRank(e.target.value), []);
+  const handleRegistrationFormUpload = useCallback(
+    (e) => setRegistrationForm(e.target.files[0]),
+    []
+  );
+  const handleAdmitCardUpload = useCallback(
+    (e) => setAdmitCard(e.target.files[0]),
+    []
+  );
+  const handleRegistrationFormRemove = useCallback(
+    () => setRegistrationForm(null),
+    []
+  );
+  const handleAdmitCardRemove = useCallback(() => setAdmitCard(null), []);
+
+  const programmeOptions = useMemo(
+    () => [
+      { value: "", label: "Select Programme" },
+      { value: "B.Tech", label: "B.tech" },
+      { value: "L.E B.Tech", label: "(L.E) B.tech" },
+    ],
+    []
+  );
+
+  const streamOptions = useMemo(
+    () => [
+      { value: "", label: "Select Stream" },
+      { value: "CSE", label: "CSE" },
+      { value: "IT", label: "IT" },
+      { value: "ECE", label: "ECE" },
+      { value: "EEE", label: "EEE" },
+    ],
+    []
+  );
 
   return (
     <div className="w-full flex flex-col justify-center items-center gap-6">
+      {/* Programme Name */}
       <div className="w-full flex justify-center items-center">
         <label htmlFor="programme_name" className="text-md w-1/3 font-semibold">
           {"Programme Name *"}
@@ -94,11 +89,14 @@ const ProgrammeDetails = ({
           value={programmeName}
           required
         >
-          <option value="">Select Programme</option>
-          <option value="B.Tech">B.tech</option>
-          <option value="L.E B.Tech">{"(L.E)"} B.tech</option>
+          {programmeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </div>
+      {/* Stream */}
       <div className="w-full flex justify-center items-center">
         <label htmlFor="stream" className="text-md w-1/3 font-semibold">
           {"Stream *"}
@@ -111,13 +109,14 @@ const ProgrammeDetails = ({
           value={stream}
           required
         >
-          <option value="">Select Stream</option>
-          <option value="CSE">CSE</option>
-          <option value="IT">IT</option>
-          <option value="ECE">ECE</option>
-          <option value="EEE">EEE</option>
+          {streamOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </div>
+      {/* Preferred Choice of shift */}
       <div className="w-full flex justify-center items-center">
         <label className="text-md w-[43.5%] font-semibold">
           {"Preferred Choice of Shift *"}{" "}
@@ -150,6 +149,7 @@ const ProgrammeDetails = ({
           </div>
         </div>
       </div>
+      {/* GGSIPU Registration Number */}
       <div className="w-full flex justify-center items-center">
         <label
           htmlFor="GGSIPU_Registration_No"
@@ -168,6 +168,7 @@ const ProgrammeDetails = ({
           required
         />
       </div>
+      {/* Registration Date */}
       <div className="w-full flex justify-center items-center">
         <label
           htmlFor="Registration_Date"
@@ -186,6 +187,7 @@ const ProgrammeDetails = ({
           required
         />
       </div>
+      {/* Roll NO CET/JEE LE */}
       <div className="w-full flex justify-center items-center">
         <label htmlFor="jee_cet_rollno" className="text-md w-1/3 font-semibold">
           {"NLT(JEE)/CET Roll No.(L.E.)"}
@@ -200,6 +202,7 @@ const ProgrammeDetails = ({
           className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
         />
       </div>
+      {/* Rank CET/JEE LE */}
       <div className="w-full flex justify-center items-center">
         <label htmlFor="jee_cet_rank" className="text-md w-1/3 font-semibold">
           {"NLT(JEE)/CET (LE)Rank"}

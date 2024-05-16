@@ -1,15 +1,18 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-const Declaration = ({ setDeclarationValid, handleDeclarationData }) => {
+const Declaration = () => {
   const [currentDate, setCurrentDate] = useState("");
   const [candidateSignature, setCandidateSignature] = useState(null);
   const [parentSignature, setParentSignature] = useState(null);
   const [showCandidateCross, setShowCandidateCross] = useState(false);
   const [showParentCross, setShowParentCross] = useState(false);
-  const [candidateSignatureError, setCandidateSignatureError] = useState("");
-  const [parentSignatureError, setParentSignatureError] = useState("");
+  const [signatureErrors, setSignatureErrors] = useState({
+    candidate: "",
+    parent: "",
+  });
 
+  // Current Data
   useEffect(() => {
     const getCurrentDate = () => {
       const today = new Date();
@@ -22,36 +25,20 @@ const Declaration = ({ setDeclarationValid, handleDeclarationData }) => {
     setCurrentDate(getCurrentDate());
   }, []);
 
+  // handling the errors
   useEffect(() => {
-    handleDeclarationData({
-      currentDate,
-      // candidateSignature,
-      // parentSignature,
-    });
-  }, [currentDate, candidateSignature, parentSignature, handleDeclarationData]);
+    const errors = {};
 
-  useEffect(() => {
-    if (candidateSignature && parentSignature) {
-      console.log("declaration is valid now!");
-      console.log({ parentSignature, candidateSignature, currentDate });
-      setDeclarationValid(true);
-      setCandidateSignatureError("");
-      setParentSignatureError("");
-    } else {
-      if (!candidateSignature) {
-        setCandidateSignatureError("Please upload Candidate's signature.");
-      } else {
-        setCandidateSignatureError("");
-      }
-      if (!parentSignature) {
-        setParentSignatureError("Please upload Parent's signature.");
-      } else {
-        setParentSignatureError("");
-      }
-      console.log("declaration is invalid now!");
-      setDeclarationValid(false);
+    if (!candidateSignature) {
+      errors.candidate = "Please upload Candidate's signature.";
     }
-  }, [candidateSignature, parentSignature, setDeclarationValid]);
+
+    if (!parentSignature) {
+      errors.parent = "Please upload Parent's signature.";
+    }
+
+    setSignatureErrors(errors);
+  }, [candidateSignature, parentSignature]);
 
   const handleFileChange = (e, type) => {
     const file = e.target.files[0];
@@ -92,9 +79,9 @@ const Declaration = ({ setDeclarationValid, handleDeclarationData }) => {
               "I understand that by merely submitting application form under management quota does not entitle/guarantee me the admission in Maharaja Surajmal Institute of Technology and if admission is granted then I hereby solemnly affirm and declare that I fulfill the eligibility conditions prescribed by the GGSIPU University and my admission would be provisional and subject to final ratification by the GGSIPU on verification. I have also read the Admission Brochure of GGSIPU for 2024-2025 and understood allocation and reservation of seats and manner of admission."
             }
           </p>
-          {candidateSignatureError && (
+          {signatureErrors.candidate && (
             <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-              {candidateSignatureError}
+              {signatureErrors.candidate}
             </p>
           )}
           <div className="w-full justify-between flex items-center">
@@ -156,9 +143,9 @@ const Declaration = ({ setDeclarationValid, handleDeclarationData }) => {
             }
           </p>
 
-          {parentSignatureError && (
+          {signatureErrors.parent && (
             <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-              {parentSignatureError}
+              {signatureErrors.parent}
             </p>
           )}
           <div className="w-full justify-between flex items-center">

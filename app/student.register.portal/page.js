@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import ProgrammeDetails from "../components/ProgrammeDetails";
 import CandidateDetails from "../components/CandidateDetails";
@@ -9,11 +9,14 @@ import Payment from "../components/Payment";
 import SubmittedForm from "../components/SubmittedForm";
 
 export default function StudentRegisterPortal() {
-  const [isProgrammeDetailsValid, setProgrammeDetailsValid] = useState(false);
-  const [isCandidateDetailsValid, setCandidateDetailsValid] = useState(false);
-  const [isDocumentsValid, setDocumentsValid] = useState(false);
-  const [isDeclarationValid, setDeclarationValid] = useState(false);
-  const [isPaymentValid, setPaymentValid] = useState(false);
+  const [formData, setFormData] = useState({
+    programmeDetails: {},
+    candidateDetails: {},
+    paymentDetails: {},
+    documentDetails: {},
+    declarationDetails: {},
+  });
+
   const [passportPhoto, setPassportPhoto] = useState(null);
   const [btechChecked, setBtechChecked] = useState({
     cse_1st_shift: false,
@@ -24,13 +27,7 @@ export default function StudentRegisterPortal() {
     it_2nd_shift: false,
     ece_2nd_shift: false,
   });
-  const [applicationNumber, setApplicationNumber] = useState("generating...");
   const [isFormSubmitted, setFormSubmitted] = useState(false);
-  const [programmeData, setProgrammeData] = useState(null);
-  const [candidateData, setCandidateData] = useState(null);
-  const [documentsData, setDocumentsData] = useState(null);
-  const [paymentData, setPaymentData] = useState(null);
-  const [declarationData, setDeclarationData] = useState(null);
 
   const [leToBtechChecked, setLeToBtechChecked] = useState({
     cse_1st_shift_le: false,
@@ -42,26 +39,6 @@ export default function StudentRegisterPortal() {
     ece_2nd_shift_le: false,
   });
   const [isLoading, setLoading] = useState(false);
-
-  const handleProgrammeData = (data) => {
-    setProgrammeData(data);
-  };
-
-  const handleCandidateData = (data) => {
-    setCandidateData(data);
-  };
-
-  const handleDocumentsData = (data) => {
-    setDocumentsData(data);
-  };
-
-  const handlePaymentData = (data) => {
-    setPaymentData(data);
-  };
-
-  const handleDeclarationData = (data) => {
-    setDeclarationData(data);
-  };
 
   const handleBtechCheckboxChange = (e) => {
     const { name, checked } = e.target;
@@ -111,75 +88,15 @@ export default function StudentRegisterPortal() {
     }
   };
 
-  useEffect(() => {
-    const generateApplicationNumber = () => {
-      const timeStamp = new Date().getTime();
-      const randomNumber = Math.floor(100000 + Math.random() * 900000);
-
-      const applicationNumber = `${timeStamp}${randomNumber}`;
-
-      return applicationNumber;
-    };
-
-    setApplicationNumber(generateApplicationNumber());
-  }, []);
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    console.log("Applicaiton Number:", applicationNumber);
-    console.log("Programme Data:", programmeData);
-    console.log("Candidate Data:", candidateData);
-    console.log("Documents Data:", documentsData);
-    console.log("Payment Data:", paymentData);
-    console.log("Declaration Data:", declarationData);
-
-    try {
-      const data = {
-        // passportPhoto,
-        ...programmeData,
-        ...candidateData,
-        ...documentsData,
-        ...paymentData,
-        ...declarationData,
-        applicationNumber: applicationNumber,
-      };
-
-      console.log("Combined Data: ", data);
-      const response = await fetch("/api/students", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create record");
-      } else {
-        console.log("Record created successfully");
-        setFormSubmitted(true);
-      }
-    } catch (err) {
-      console.log("Error in creating record", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const isFormValid = () => {
-    return (
-      isProgrammeDetailsValid &&
-      isCandidateDetailsValid &&
-      isDocumentsValid &&
-      isPaymentValid &&
-      isDeclarationValid &&
-      passportPhoto
-    );
-  };
-
   const handlePassportPhotoUpload = (e) => {
     const file = e.target.files[0];
     setPassportPhoto(file);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    console.log(formData);
+    alert("Form Submitted Successfully");
   };
 
   const handleRemovePhoto = () => {
@@ -359,41 +276,41 @@ export default function StudentRegisterPortal() {
             className="py-10 px-4 rounded-xl w-2/3 bg-indigo-100 flex flex-col items-center justify-center gap-6"
           >
             <ProgrammeDetails
-              setProgrammeDetailsValid={setProgrammeDetailsValid}
               id="programme_details"
-              handleProgrammeData={handleProgrammeData}
+              formData={formData.programmeDetails}
+              setFormData={setFormData}
             />
 
             <div className="w-[90%] border border-indigo-400 my-2 rounded-full border-dotted" />
 
             <CandidateDetails
-              handleCandidateData={handleCandidateData}
-              setCandidateDetailsValid={setCandidateDetailsValid}
               id="candidate_details"
+              formData={formData.candidateDetails}
+              // setFormData={setFormData}
             />
 
             <div className="w-[90%] border border-indigo-400 my-2 rounded-full border-dotted" />
 
             <Documents
-              setDocumentsValid={setDocumentsValid}
               id="documents"
-              handleDocumentsData={handleDocumentsData}
+              formData={formData.documentDetails}
+              // setFormData={setFormData}
             />
 
             <div className="w-[90%] border border-indigo-400 my-2 rounded-full border-dotted" />
 
             <Payment
-              setPaymentValid={setPaymentValid}
               id="payment"
-              handlePaymentData={handlePaymentData}
+              formData={formData.paymentDetails}
+              // setFormData={setFormData}
             />
 
             <div className="w-[90%] border border-indigo-400 my-2 rounded-full border-dotted" />
 
             <Declaration
-              setDeclarationValid={setDeclarationValid}
               id="declaration"
-              handleDeclarationData={handleDeclarationData}
+              formData={formData.declarationDetails}
+              // setFormData={setFormData}
             />
 
             {/* External Reference to msit.in */}
@@ -453,10 +370,10 @@ export default function StudentRegisterPortal() {
               )}
             </button>
             {/* Form No */}
-            <div className="border-2 border-indigo-900 flex items-center justify-between gap-2 absolute left-8 top-16 px-4 py-2 rounded-lg">
+            <div className="hidden border-2 border-indigo-900 flex items-center justify-between gap-2 absolute left-8 top-16 px-4 py-2 rounded-lg">
               <p className="text-md">{"Application No. "}</p>
               <span className="text-md font-bold underline underline-offset-2">
-                {applicationNumber}
+                {/* {applicationNumber} */}
               </span>
             </div>
             {/* Passport size photograph upload */}
@@ -505,7 +422,7 @@ export default function StudentRegisterPortal() {
           </form>
 
           <p className="text-md font-medium mb-8">
-            Already have an exisiting application on the portal? Login from{" "}
+            Already have an existing application on the portal? Login from{" "}
             <Link
               href={"/student.login.portal"}
               className="font-semibold text-green-700 hover:text-green-600 active:text-green-800 cursor-pointer"
@@ -515,7 +432,7 @@ export default function StudentRegisterPortal() {
           </p>
         </>
       ) : (
-        <SubmittedForm applicationNumber={applicationNumber} />
+        <SubmittedForm applicationNumber={1232} />
       )}
     </main>
   );

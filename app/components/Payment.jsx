@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-const Payment = ({ setPaymentValid, handlePaymentData }) => {
+const Payment = () => {
   const [paymentReceipt, setPaymentReceipt] = useState(null);
   const [paymentReceiptError, setPaymentReceiptError] = useState("");
 
@@ -18,21 +18,13 @@ const Payment = ({ setPaymentValid, handlePaymentData }) => {
   };
 
   useEffect(() => {
-    handlePaymentData({});
-  }, [paymentReceipt, handlePaymentData]);
-
-  useEffect(() => {
     if (paymentReceipt) {
-      console.log("Payment is valid now!");
       console.log(paymentReceipt);
       setPaymentReceiptError("");
-      setPaymentValid(true);
     } else {
       setPaymentReceiptError("Please upload Payment Receipt/Proof.");
-      console.log("Payment is invalid now!");
-      setPaymentValid(false);
     }
-  }, [paymentReceipt, setPaymentValid]);
+  }, [paymentReceipt]);
 
   const handleRemoveReceipt = () => {
     setPaymentReceipt(null);
