@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
+import axios from "axios";
 
 export default function StudentRegisterPortal() {
   const [formData, setFormData] = useState({
@@ -87,10 +88,41 @@ export default function StudentRegisterPortal() {
     setPassportPhoto(file);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
-    console.log(formData);
-    alert("Form Submitted Successfully");
+    // console.log(formData);
+    if (!appNo) {
+      alert("GGSIPU APPLICATION NUMBER IS REQUIRED!");
+    } else {
+      try {
+        const data = await axios.post(
+          "https://backend-management-0xpn.onrender.com/submit-form",
+          {
+            programmeName,
+            stream,
+            shift,
+            appNo,
+            regDate,
+            rollNo,
+            rank,
+            ...validFields,
+            category,
+            region,
+            ...formValues,
+            applicationNumber: appNo,
+          }
+        );
+
+        if (data) {
+          setLoading(false);
+          alert("Form submitted successfully");
+          setFormSubmitted(true);
+        }
+      } catch (err) {
+        console.log("Error in submitting data", err);
+      }
+    }
   };
 
   const handleRemovePhoto = () => {
@@ -98,366 +130,365 @@ export default function StudentRegisterPortal() {
   };
 
   const [programmeName, setProgrammeName] = useState("");
-    const [stream, setStream] = useState("");
-    const [shift, setShift] = useState("");
-    const [appNo, setAppNo] = useState("");
-    const [regDate, setRegDate] = useState("");
-    const [rollNo, setRollNo] = useState("");
-    const [rank, setRank] = useState("");
-    const [registrationForm, setRegistrationForm] = useState(null);
-    const [admitCard, setAdmitCard] = useState(null);
-    const [registrationFormError, setRegistrationFormError] = useState("");
-    const [admitCardError, setAdmitCardError] = useState("");
-    const [categoryCertificate, setCategoryCertificate] = useState(null);
-    const [validFields, setValidFields] = useState({
-      first_name: "",
-      middle_name: "",
-      surname: "",
-      father_first_name: "",
-      father_middle_name: "",
-      father_surname: "",
-      mother_first_name: "",
-      mother_middle_name: "",
-      mother_surname: "",
-      legible_postal_address: "",
-      legible_contact: "",
-      legible_email: "",
-      dob: "",
-    });
-    const [categoryCertificateError, setCategoryCertificateError] = useState("");
-    const [category, setCategory] = useState("General");
-    const [region, setRegion] = useState("");
-    const [paymentReceipt, setPaymentReceipt] = useState(null);
-    const [paymentReceiptError, setPaymentReceiptError] = useState("");
+  const [stream, setStream] = useState("");
+  const [shift, setShift] = useState("");
+  const [appNo, setAppNo] = useState("");
+  const [regDate, setRegDate] = useState("");
+  const [rollNo, setRollNo] = useState("");
+  const [rank, setRank] = useState("");
+  const [registrationForm, setRegistrationForm] = useState(null);
+  const [admitCard, setAdmitCard] = useState(null);
+  const [registrationFormError, setRegistrationFormError] = useState("");
+  const [admitCardError, setAdmitCardError] = useState("");
+  const [categoryCertificate, setCategoryCertificate] = useState(null);
+  const [validFields, setValidFields] = useState({
+    first_name: "",
+    middle_name: "",
+    surname: "",
+    father_first_name: "",
+    father_middle_name: "",
+    father_surname: "",
+    mother_first_name: "",
+    mother_middle_name: "",
+    mother_surname: "",
+    legible_postal_address: "",
+    legible_contact: "",
+    legible_email: "",
+    dob: "",
+  });
+  const [categoryCertificateError, setCategoryCertificateError] = useState("");
+  const [category, setCategory] = useState("General");
+  const [region, setRegion] = useState("");
+  const [paymentReceipt, setPaymentReceipt] = useState(null);
+  const [paymentReceiptError, setPaymentReceiptError] = useState("");
 
-  
-    useEffect(() => {
-      if (!registrationForm) {
-        setRegistrationFormError("Please upload GGSIPU Registration Form.");
-      } else {
-        setRegistrationFormError("");
-      }
-  
-      if (!admitCard) {
-        setAdmitCardError("Please upload Admit Card.");
-      } else {
-        setAdmitCardError("");
-      }
-    }, [registrationForm, admitCard]);
-  
-    const handleProgrammeSelect = useCallback((e) => {
-      setProgrammeName(e.target.value);
-    }, []);
-  
-    const handleStreamSelect = useCallback((e) => setStream(e.target.value), []);
-    const handleShiftSelect = useCallback((e) => setShift(e.target.value), []);
-    const handleApplicationNo = useCallback((e) => setAppNo(e.target.value), []);
-    const handleRegistrationDate = useCallback(
-      (e) => setRegDate(e.target.value),
-      []
-    );
-    const handleRollNo = useCallback((e) => setRollNo(e.target.value), []);
-    const handleRank = useCallback((e) => setRank(e.target.value), []);
-    const handleRegistrationFormUpload = useCallback(
-      (e) => setRegistrationForm(e.target.files[0]),
-      []
-    );
-    const handleAdmitCardUpload = useCallback(
-      (e) => setAdmitCard(e.target.files[0]),
-      []
-    );
-    const handleRegistrationFormRemove = useCallback(
-      () => setRegistrationForm(null),
-      []
-    );
-    const handleAdmitCardRemove = useCallback(() => setAdmitCard(null), []);
+  useEffect(() => {
+    if (!registrationForm) {
+      setRegistrationFormError("Please upload GGSIPU Registration Form.");
+    } else {
+      setRegistrationFormError("");
+    }
 
-    const handleCategoryChange = (e) => {
-      const selectedCategory = e.target.value;
-      setCategory(selectedCategory);
-      if (selectedCategory !== "General") {
-        setCategoryCertificateError("Please upload Category Certificate");
-      } else {
+    if (!admitCard) {
+      setAdmitCardError("Please upload Admit Card.");
+    } else {
+      setAdmitCardError("");
+    }
+  }, [registrationForm, admitCard]);
+
+  const handleProgrammeSelect = useCallback((e) => {
+    setProgrammeName(e.target.value);
+  }, []);
+
+  const handleStreamSelect = useCallback((e) => setStream(e.target.value), []);
+  const handleShiftSelect = useCallback((e) => setShift(e.target.value), []);
+  const handleApplicationNo = useCallback((e) => setAppNo(e.target.value), []);
+  const handleRegistrationDate = useCallback(
+    (e) => setRegDate(e.target.value),
+    []
+  );
+  const handleRollNo = useCallback((e) => setRollNo(e.target.value), []);
+  const handleRank = useCallback((e) => setRank(e.target.value), []);
+  const handleRegistrationFormUpload = useCallback(
+    (e) => setRegistrationForm(e.target.files[0]),
+    []
+  );
+  const handleAdmitCardUpload = useCallback(
+    (e) => setAdmitCard(e.target.files[0]),
+    []
+  );
+  const handleRegistrationFormRemove = useCallback(
+    () => setRegistrationForm(null),
+    []
+  );
+  const handleAdmitCardRemove = useCallback(() => setAdmitCard(null), []);
+
+  const handleCategoryChange = (e) => {
+    const selectedCategory = e.target.value;
+    setCategory(selectedCategory);
+    if (selectedCategory !== "General") {
+      setCategoryCertificateError("Please upload Category Certificate");
+    } else {
+      setCategoryCertificateError("");
+    }
+    validateForm();
+  };
+
+  const handleRegionChange = (e) => {
+    setRegion(e.target.value);
+    validateForm();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    const selectedCategory = category;
+    if (selectedCategory !== "General") {
+      if (file && file.type === "application/pdf") {
+        setCategoryCertificate(file);
         setCategoryCertificateError("");
-      }
-      validateForm();
-    };
-  
-    const handleRegionChange = (e) => {
-      setRegion(e.target.value);
-      validateForm();
-    };
-  
-    const handleFileChange = (e) => {
-      const file = e.target.files[0];
-      const selectedCategory = category;
-      if (selectedCategory !== "General") {
-        if (file && file.type === "application/pdf") {
-          setCategoryCertificate(file);
-          setCategoryCertificateError("");
+      } else {
+        if (!file) {
+          setCategoryCertificateError(
+            "Please upload a PDF file for the selected category!"
+          );
         } else {
-          if (!file) {
-            setCategoryCertificateError(
-              "Please upload a PDF file for the selected category!"
-            );
-          } else {
-            setCategoryCertificateError(
-              "Invalid file format for selected category. Please upload a PDF file!"
-            );
-          }
-          setCategoryCertificate(null);
+          setCategoryCertificateError(
+            "Invalid file format for selected category. Please upload a PDF file!"
+          );
         }
-      } else {
-        setCategoryCertificateError("");
         setCategoryCertificate(null);
-        validateForm();
       }
-    };
-  
-    const handleRemoveFile = () => {
+    } else {
+      setCategoryCertificateError("");
       setCategoryCertificate(null);
-    };
-  
-    const handleInputChange = (e) => {
-      const { name, value } = e.target;
-      setValidFields((prevState) => ({
-        ...prevState,
-        [name]: value,
-      }));
       validateForm();
-    };
-  
-    const validateForm = () => {
-      if (
-        Object.values(validFields).every((field) => field !== "") &&
-        category !== "" &&
-        region !== ""
-      ) {
-        handleCandidateData({
-          ...validFields,
-          category,
-          region,
-          categoryCertificate:
-            category !== "General" ? categoryCertificate : null,
-        });
-      }
-    };
-  
-    const programmeOptions = useMemo(
-      () => [
-        { value: "", label: "Select Programme" },
-        { value: "B.Tech", label: "B.tech" },
-        { value: "L.E B.Tech", label: "(L.E) B.tech" },
-      ],
-      []
-    );
-  
-    const streamOptions = useMemo(
-      () => [
-        { value: "", label: "Select Stream" },
-        { value: "CSE", label: "CSE" },
-        { value: "IT", label: "IT" },
-        { value: "ECE", label: "ECE" },
-        { value: "EEE", label: "EEE" },
-      ],
-      []
-    );
-    
-    const handleReceiptUpload = (e) => {
-      const file = e.target.files[0];
-      if (
-        file &&
-        (file.type === "application/pdf" || file.type.startsWith("image/"))
-      ) {
-        setPaymentReceipt(file);
-      } else {
-        alert("Please upload an image or a PDF file only!");
-      }
-    };
-  
-    useEffect(() => {
-      if (paymentReceipt) {
-        console.log(paymentReceipt);
-        setPaymentReceiptError("");
-      } else {
-        setPaymentReceiptError("Please upload Payment Receipt/Proof.");
-      }
-    }, [paymentReceipt]);
-  
-    const handleRemoveReceipt = () => {
-      setPaymentReceipt(null);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setCategoryCertificate(null);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setValidFields((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+    validateForm();
+  };
+
+  const validateForm = () => {
+    if (
+      Object.values(validFields).every((field) => field !== "") &&
+      category !== "" &&
+      region !== ""
+    ) {
+      handleCandidateData({
+        ...validFields,
+        category,
+        region,
+        categoryCertificate:
+          category !== "General" ? categoryCertificate : null,
+      });
+    }
+  };
+
+  const programmeOptions = useMemo(
+    () => [
+      { value: "", label: "Select Programme" },
+      { value: "B.Tech", label: "B.tech" },
+      { value: "L.E B.Tech", label: "(L.E) B.tech" },
+    ],
+    []
+  );
+
+  const streamOptions = useMemo(
+    () => [
+      { value: "", label: "Select Stream" },
+      { value: "CSE", label: "CSE" },
+      { value: "IT", label: "IT" },
+      { value: "ECE", label: "ECE" },
+      { value: "EEE", label: "EEE" },
+    ],
+    []
+  );
+
+  const handleReceiptUpload = (e) => {
+    const file = e.target.files[0];
+    if (
+      file &&
+      (file.type === "application/pdf" || file.type.startsWith("image/"))
+    ) {
+      setPaymentReceipt(file);
+    } else {
+      alert("Please upload an image or a PDF file only!");
+    }
+  };
+
+  useEffect(() => {
+    if (paymentReceipt) {
+      console.log(paymentReceipt);
+      setPaymentReceiptError("");
+    } else {
+      setPaymentReceiptError("Please upload Payment Receipt/Proof.");
+    }
+  }, [paymentReceipt]);
+
+  const handleRemoveReceipt = () => {
+    setPaymentReceipt(null);
+  };
+
+  const [currentDate, setCurrentDate] = useState("");
+  const [candidateSignature, setCandidateSignature] = useState(null);
+  const [parentSignature, setParentSignature] = useState(null);
+  const [showCandidateCross, setShowCandidateCross] = useState(false);
+  const [showParentCross, setShowParentCross] = useState(false);
+  const [signatureErrors, setSignatureErrors] = useState({
+    candidate: "",
+    parent: "",
+  });
+
+  // Current Data
+  useEffect(() => {
+    const getCurrentDate = () => {
+      const today = new Date();
+      const dd = String(today.getDate()).padStart(2, "0");
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const yyyy = today.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
     };
 
-    const [currentDate, setCurrentDate] = useState("");
-    const [candidateSignature, setCandidateSignature] = useState(null);
-    const [parentSignature, setParentSignature] = useState(null);
-    const [showCandidateCross, setShowCandidateCross] = useState(false);
-    const [showParentCross, setShowParentCross] = useState(false);
-    const [signatureErrors, setSignatureErrors] = useState({
-      candidate: "",
-      parent: "",
-    });
-  
-    // Current Data
-    useEffect(() => {
-      const getCurrentDate = () => {
-        const today = new Date();
-        const dd = String(today.getDate()).padStart(2, "0");
-        const mm = String(today.getMonth() + 1).padStart(2, "0");
-        const yyyy = today.getFullYear();
-        return `${dd}/${mm}/${yyyy}`;
+    setCurrentDate(getCurrentDate());
+  }, []);
+
+  // handling the errors
+  useEffect(() => {
+    const errors = {};
+
+    if (!candidateSignature) {
+      errors.candidate = "Please upload Candidate's signature.";
+    }
+
+    if (!parentSignature) {
+      errors.parent = "Please upload Parent's signature.";
+    }
+
+    setSignatureErrors(errors);
+  }, [candidateSignature, parentSignature]);
+
+  const handleDeclarationFileChange = (e, type) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (type === "candidate") {
+          setCandidateSignature(reader.result);
+          setShowCandidateCross(true);
+        } else if (type === "parent") {
+          setParentSignature(reader.result);
+          setShowParentCross(true);
+        }
       };
-  
-      setCurrentDate(getCurrentDate());
-    }, []);
-  
-    // handling the errors
-    useEffect(() => {
-      const errors = {};
-  
-      if (!candidateSignature) {
-        errors.candidate = "Please upload Candidate's signature.";
-      }
-  
-      if (!parentSignature) {
-        errors.parent = "Please upload Parent's signature.";
-      }
-  
-      setSignatureErrors(errors);
-    }, [candidateSignature, parentSignature]);
-  
-    const handleDeclarationFileChange = (e, type) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (type === "candidate") {
-            setCandidateSignature(reader.result);
-            setShowCandidateCross(true);
-          } else if (type === "parent") {
-            setParentSignature(reader.result);
-            setShowParentCross(true);
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-  
-    const handleRemoveImage = (type) => {
-      if (type === "candidate") {
-        setCandidateSignature(null);
-        setShowCandidateCross(false);
-      } else if (type === "parent") {
-        setParentSignature(null);
-        setShowParentCross(false);
-      }
-    };
+      reader.readAsDataURL(file);
+    }
+  };
 
-    const [files, setFiles] = useState({
-      "10th_marksheet": null,
-      "12th_marksheet": null,
-      diploma_certificate: null,
-    });
-  
-    const [marksheet_error_10, setMarksheetError_10] = useState("");
-    const [marksheet_error_12, setMarksheetError_12] = useState("");
-    const [diploma_certificate_error, setDiplomaCertificateError] = useState("");
-  
-    const [formValues, setFormValues] = useState({
-      board: "",
-      roll_no: "",
-      year: "",
-      subject_1: "",
-      subject_2: "",
-      subject_3: "",
-      subject_4: "",
-      subject_5: "",
-      subject_6: "",
-      total_marks: "",
-      total_percentage: "",
-      board_12: "",
-      roll_no_12: "",
-      year_12: "",
-      subject_1_12: "",
-      subject_2_12: "",
-      subject_3_12: "",
-      subject_4_12: "",
-      subject_5_12: "",
-      subject_6_12: "",
-      total_marks_12: "",
-      total_percentage_12: "",
-      university: "",
-      roll_no_university: "",
-      subjects_1st_year: "",
-      t_m_1: "",
-      m_o_1: "",
-      p_1: "",
-      subjects_2nd_year: "",
-      t_m_2: "",
-      m_o_2: "",
-      p_2: "",
-      subjects_3rd_year: "",
-      t_m_3: "",
-      m_o_3: "",
-      p_3: "",
-    });
-  
-    useEffect(() => {
-      if (!files["10th_marksheet"])
-        setMarksheetError_10(
-          "Please upload 10th Marksheet and Passing Certificate."
-        );
-      else setMarksheetError_10("");
-  
-      if (!files["12th_marksheet"])
-        setMarksheetError_12(
-          "Please upload 12th Marksheet and Passing Certificate."
-        );
-      else setMarksheetError_12("");
-  
-      if (!files["diploma_certificate"] && formValues.university !== "")
-        setDiplomaCertificateError(
-          "Please upload Diploma Marksheet and Passing Certificate."
-        );
-      else setDiplomaCertificateError("");
-    }, [formValues, files]);
-  
-    const handleFileUpload = (e, type) => {
-      const file = e.target.files[0];
-      setFiles({ ...files, [type]: file });
-    };
-  
-    const handleFileRemove = (type) => {
-      setFiles({ ...files, [type]: null });
-    };
-  
-    const handleFileInputChange = (e) => {
-      const { name, value } = e.target;
-  
-      let percentage_diploma = 0;
-  
-      setFormValues((prevFormValues) => ({
-        ...prevFormValues,
-        [name]: value,
-      }));
-  
-      if (name === "m_o_1" && formValues.t_m_1 !== 0) {
-        percentage_diploma =
-          (parseFloat(value) / parseFloat(formValues.t_m_1)) * 100;
-      } else if (name === "m_o_2" && formValues.t_m_2 !== 0) {
-        percentage_diploma =
-          (parseFloat(value) / parseFloat(formValues.t_m_2)) * 100;
-      } else if (name === "m_o_3" && formValues.t_m_3 !== 0) {
-        percentage_diploma =
-          (parseFloat(value) / parseFloat(formValues.t_m_3)) * 100;
-      }
-  
-      setFormValues((prevFormValues) => ({
-        ...prevFormValues,
-        [name === "m_o_1" ? "p_1" : name === "m_o_2" ? "p_2" : "p_3"]:
-          percentage_diploma.toFixed(2),
-      }));
-    };
+  const handleRemoveImage = (type) => {
+    if (type === "candidate") {
+      setCandidateSignature(null);
+      setShowCandidateCross(false);
+    } else if (type === "parent") {
+      setParentSignature(null);
+      setShowParentCross(false);
+    }
+  };
+
+  const [files, setFiles] = useState({
+    "10th_marksheet": null,
+    "12th_marksheet": null,
+    diploma_certificate: null,
+  });
+
+  const [marksheet_error_10, setMarksheetError_10] = useState("");
+  const [marksheet_error_12, setMarksheetError_12] = useState("");
+  const [diploma_certificate_error, setDiplomaCertificateError] = useState("");
+
+  const [formValues, setFormValues] = useState({
+    board: "",
+    roll_no: "",
+    year: "",
+    subject_1: "",
+    subject_2: "",
+    subject_3: "",
+    subject_4: "",
+    subject_5: "",
+    subject_6: "",
+    total_marks: "",
+    total_percentage: "",
+    board_12: "",
+    roll_no_12: "",
+    year_12: "",
+    subject_1_12: "",
+    subject_2_12: "",
+    subject_3_12: "",
+    subject_4_12: "",
+    subject_5_12: "",
+    subject_6_12: "",
+    total_marks_12: "",
+    total_percentage_12: "",
+    university: "",
+    roll_no_university: "",
+    subjects_1st_year: "",
+    t_m_1: "",
+    m_o_1: "",
+    p_1: "",
+    subjects_2nd_year: "",
+    t_m_2: "",
+    m_o_2: "",
+    p_2: "",
+    subjects_3rd_year: "",
+    t_m_3: "",
+    m_o_3: "",
+    p_3: "",
+  });
+
+  useEffect(() => {
+    if (!files["10th_marksheet"])
+      setMarksheetError_10(
+        "Please upload 10th Marksheet and Passing Certificate."
+      );
+    else setMarksheetError_10("");
+
+    if (!files["12th_marksheet"])
+      setMarksheetError_12(
+        "Please upload 12th Marksheet and Passing Certificate."
+      );
+    else setMarksheetError_12("");
+
+    if (!files["diploma_certificate"] && formValues.university !== "")
+      setDiplomaCertificateError(
+        "Please upload Diploma Marksheet and Passing Certificate."
+      );
+    else setDiplomaCertificateError("");
+  }, [formValues, files]);
+
+  const handleFileUpload = (e, type) => {
+    const file = e.target.files[0];
+    setFiles({ ...files, [type]: file });
+  };
+
+  const handleFileRemove = (type) => {
+    setFiles({ ...files, [type]: null });
+  };
+
+  const handleFileInputChange = (e) => {
+    const { name, value } = e.target;
+
+    let percentage_diploma = 0;
+
+    setFormValues((prevFormValues) => ({
+      ...prevFormValues,
+      [name]: value,
+    }));
+
+    if (name === "m_o_1" && formValues.t_m_1 !== 0) {
+      percentage_diploma =
+        (parseFloat(value) / parseFloat(formValues.t_m_1)) * 100;
+    } else if (name === "m_o_2" && formValues.t_m_2 !== 0) {
+      percentage_diploma =
+        (parseFloat(value) / parseFloat(formValues.t_m_2)) * 100;
+    } else if (name === "m_o_3" && formValues.t_m_3 !== 0) {
+      percentage_diploma =
+        (parseFloat(value) / parseFloat(formValues.t_m_3)) * 100;
+    }
+
+    setFormValues((prevFormValues) => ({
+      ...prevFormValues,
+      [name === "m_o_1" ? "p_1" : name === "m_o_2" ? "p_2" : "p_3"]:
+        percentage_diploma.toFixed(2),
+    }));
+  };
 
   return (
     <main className="flex flex-col justify-center items-center w-full my-12 gap-6 relative">
@@ -635,7 +666,10 @@ export default function StudentRegisterPortal() {
             <div className="w-full flex flex-col justify-center items-center gap-6">
               {/* Programme Name */}
               <div className="w-full flex justify-center items-center">
-                <label htmlFor="programme_name" className="text-md w-1/3 font-semibold">
+                <label
+                  htmlFor="programme_name"
+                  className="text-md w-1/3 font-semibold"
+                >
                   {"Programme Name *"}
                 </label>
                 <select
@@ -746,7 +780,10 @@ export default function StudentRegisterPortal() {
               </div>
               {/* Roll NO CET/JEE LE */}
               <div className="w-full flex justify-center items-center">
-                <label htmlFor="jee_cet_rollno" className="text-md w-1/3 font-semibold">
+                <label
+                  htmlFor="jee_cet_rollno"
+                  className="text-md w-1/3 font-semibold"
+                >
                   {"NLT(JEE)/CET Roll No.(L.E.)"}
                 </label>
                 <input
@@ -761,7 +798,10 @@ export default function StudentRegisterPortal() {
               </div>
               {/* Rank CET/JEE LE */}
               <div className="w-full flex justify-center items-center">
-                <label htmlFor="jee_cet_rank" className="text-md w-1/3 font-semibold">
+                <label
+                  htmlFor="jee_cet_rank"
+                  className="text-md w-1/3 font-semibold"
+                >
                   {"NLT(JEE)/CET (LE)Rank"}
                 </label>
                 <input
@@ -881,7 +921,10 @@ export default function StudentRegisterPortal() {
               <h2 className="font-semibold text-xl my-2">Personal Details</h2>
               {/* Candidate's Name */}
               <div className="w-full flex justify-center items-center">
-                <label htmlFor="first_name" className="text-md w-1/3 font-semibold">
+                <label
+                  htmlFor="first_name"
+                  className="text-md w-1/3 font-semibold"
+                >
                   {"Candidate's Name *"}
                 </label>
                 <div className="w-1/2 flex gap-6 items-center justify-center">
@@ -1051,7 +1094,10 @@ export default function StudentRegisterPortal() {
               </div>
               {/* Legible Email I.D. */}
               <div className="w-full flex justify-center items-center">
-                <label htmlFor="legible_email" className="text-md w-1/3 font-semibold">
+                <label
+                  htmlFor="legible_email"
+                  className="text-md w-1/3 font-semibold"
+                >
                   {"Write Legible Email I.D. *"}
                 </label>
                 <div className="w-1/2 flex gap-6 items-center justify-center">
@@ -1088,7 +1134,10 @@ export default function StudentRegisterPortal() {
               </div>
               {/* Category Selection for Reservation */}
               <div className="w-full flex justify-center items-center">
-                <label htmlFor="category" className="text-md w-1/3 font-semibold">
+                <label
+                  htmlFor="category"
+                  className="text-md w-1/3 font-semibold"
+                >
                   {
                     "Tick in the relevant Category for claiming the Reservation. (General Category will not be given reservation benefit.) *"
                   }
@@ -1157,7 +1206,7 @@ export default function StudentRegisterPortal() {
                   {categoryCertificateError}
                 </p>
               )}
-        
+
               {/* Category Certificate Attachment */}
               <div className="w-full flex justify-center items-center">
                 <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
@@ -1257,7 +1306,10 @@ export default function StudentRegisterPortal() {
                 {/* board and rollno */}
                 <div className="w-full flex justify-center gap-12 items-center">
                   <div className="w-1/3 flex justify-between items-center">
-                    <label htmlFor="board" className="text-md w-1/3 font-semibold">
+                    <label
+                      htmlFor="board"
+                      className="text-md w-1/3 font-semibold"
+                    >
                       {"Board *"}
                     </label>
                     <input
@@ -1272,7 +1324,10 @@ export default function StudentRegisterPortal() {
                     />
                   </div>
                   <div className="w-1/3 flex justify-between items-center">
-                    <label htmlFor="roll_no" className="text-md w-1/3 font-semibold">
+                    <label
+                      htmlFor="roll_no"
+                      className="text-md w-1/3 font-semibold"
+                    >
                       {"Roll No. *"}
                     </label>
                     <input
@@ -1290,7 +1345,10 @@ export default function StudentRegisterPortal() {
                 {/* year */}
                 <div className="w-[73%] flex justify-left items-center">
                   <div className="w-1/3 flex justify-between items-center">
-                    <label htmlFor="year" className="text-md w-1/3 font-semibold mr-10">
+                    <label
+                      htmlFor="year"
+                      className="text-md w-1/3 font-semibold mr-10"
+                    >
                       {"Year *"}
                     </label>
                     <input
@@ -1502,7 +1560,9 @@ export default function StudentRegisterPortal() {
                           name="10th_marksheet_upload"
                           id="10th_marksheet_upload"
                           accept=".pdf"
-                          onChange={(e) => handleFileUpload(e, "10th_marksheet")}
+                          onChange={(e) =>
+                            handleFileUpload(e, "10th_marksheet")
+                          }
                           className="hidden"
                           required
                         />
@@ -1525,7 +1585,10 @@ export default function StudentRegisterPortal() {
                 {/* board and rollno */}
                 <div className="w-full flex justify-center gap-12 items-center">
                   <div className="w-1/3 flex justify-between items-center">
-                    <label htmlFor="board_12" className="text-md w-1/3 font-semibold">
+                    <label
+                      htmlFor="board_12"
+                      className="text-md w-1/3 font-semibold"
+                    >
                       {"Board *"}
                     </label>
                     <input
@@ -1540,7 +1603,10 @@ export default function StudentRegisterPortal() {
                     />
                   </div>
                   <div className="w-1/3 flex justify-between items-center">
-                    <label htmlFor="roll_no_12" className="text-md w-1/3 font-semibold">
+                    <label
+                      htmlFor="roll_no_12"
+                      className="text-md w-1/3 font-semibold"
+                    >
                       {"Roll No. *"}
                     </label>
                     <input
@@ -1773,7 +1839,9 @@ export default function StudentRegisterPortal() {
                           name="12th_marksheet_upload"
                           id="12th_marksheet_upload"
                           accept=".pdf"
-                          onChange={(e) => handleFileUpload(e, "12th_marksheet")}
+                          onChange={(e) =>
+                            handleFileUpload(e, "12th_marksheet")
+                          }
                           className="hidden"
                         />
                         <label
@@ -1790,12 +1858,17 @@ export default function StudentRegisterPortal() {
               {/* Diploma Students Lateral Entry B.tech */}
               <div className="w-[90%] flex flex-col items-center gap-6 border-2 border-indigo-200 p-4 rounded-lg">
                 <div className="w-[90%] my-2 font-medium text-md bg-purple-100 border-2 border-red-600 rounded-md p-4 text-center">
-                  {"* To be filled by Applicants of B.Tech. (Lateral Entry) Programme "}
+                  {
+                    "* To be filled by Applicants of B.Tech. (Lateral Entry) Programme "
+                  }
                 </div>
                 {/* University and rollno */}
                 <div className="w-full flex justify-center gap-12 items-center">
                   <div className="w-1/3 flex justify-between items-center">
-                    <label htmlFor="university" className="text-md w-2/3 font-semibold">
+                    <label
+                      htmlFor="university"
+                      className="text-md w-2/3 font-semibold"
+                    >
                       {"University "}
                     </label>
                     <input
@@ -1903,7 +1976,7 @@ export default function StudentRegisterPortal() {
                     className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
                   />
                 </div>
-        
+
                 <div className="w-[75%] flex justify-center gap-6 items-center">
                   {/* Total Marks, Marks Obtained and Percentage in 1st year */}
                   <input
@@ -1959,7 +2032,7 @@ export default function StudentRegisterPortal() {
                     className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
                   />
                 </div>
-        
+
                 <div className="w-[75%] flex justify-center gap-6 items-center">
                   {/* Total Marks, Marks Obtained and Percentage in 3rd year */}
                   <input
@@ -1993,7 +2066,7 @@ export default function StudentRegisterPortal() {
                     className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
                   />
                 </div>
-        
+
                 {diploma_certificate_error && (
                   <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
                     {diploma_certificate_error}
@@ -2016,7 +2089,9 @@ export default function StudentRegisterPortal() {
                           {files["diploma_certificate"].name}
                         </span>
                         <button
-                          onClick={() => handleFileRemove("diploma_certificate")}
+                          onClick={() =>
+                            handleFileRemove("diploma_certificate")
+                          }
                           className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
                         >
                           Remove
@@ -2029,7 +2104,9 @@ export default function StudentRegisterPortal() {
                           name="diploma_certificate"
                           id="diploma_certificate"
                           accept=".pdf"
-                          onChange={(e) => handleFileUpload(e, "diploma_certificate")}
+                          onChange={(e) =>
+                            handleFileUpload(e, "diploma_certificate")
+                          }
                           className="hidden"
                         />
                         <label
@@ -2051,7 +2128,8 @@ export default function StudentRegisterPortal() {
             <div className="w-full flex flex-col justify-center items-center gap-6">
               <div className="flex flex-col items-start gap-4 text-md font-medium text-center mb-4 bg-purple-100 border-2 border-red-600 rounded-md w-[90%] px-6 py-6">
                 <p>
-                  {"* Deposit"} <span className="font-bold">{" Rs. 5000/- "}</span>{" "}
+                  {"* Deposit"}{" "}
+                  <span className="font-bold">{" Rs. 5000/- "}</span>{" "}
                   {
                     "as registration charges (Non-Refundable) to MSIT, either through NEFT/RTGS."
                   }
@@ -2061,7 +2139,9 @@ export default function StudentRegisterPortal() {
                 </h2>
                 <div className="flex flex-col items-start justify-center gap-2 w-full">
                   <p className="text-md font-medium">
-                    <span className="font-bold mr-2">{"Name Of Institute:"}</span>
+                    <span className="font-bold mr-2">
+                      {"Name Of Institute:"}
+                    </span>
                     {"Maharaja Surajmal Institute of Technology"}
                   </p>
                   <p className="text-md font-medium">
@@ -2191,7 +2271,9 @@ export default function StudentRegisterPortal() {
                             accept="image/*"
                             className="hidden"
                             required
-                            onChange={(e) => handleDeclarationFileChange(e, "candidate")}
+                            onChange={(e) =>
+                              handleDeclarationFileChange(e, "candidate")
+                            }
                           />
                           <label
                             htmlFor="candidate_sign"
@@ -2208,7 +2290,7 @@ export default function StudentRegisterPortal() {
                       "I have carefully read and verified the information furnished by my son/daughter/ward and affirm that it is true and correct and he/she fulfills the eligibility conditions as mentioned in the Admission Bulletin/Rules of GGSIPU."
                     }
                   </p>
-        
+
                   {signatureErrors.parent && (
                     <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
                       {signatureErrors.parent}
@@ -2255,7 +2337,9 @@ export default function StudentRegisterPortal() {
                             accept="image/*"
                             className="hidden"
                             required
-                            onChange={(e) => handleDeclarationFileChange(e, "parent")}
+                            onChange={(e) =>
+                              handleDeclarationFileChange(e, "parent")
+                            }
                           />
                           <label
                             htmlFor="parent_sign"
@@ -2396,8 +2480,7 @@ export default function StudentRegisterPortal() {
             Student registered successfully!
           </h2>
           <p className="text-lg mb-4">
-            Your Application Number:{" "}
-            <span className="font-bold">{applicationNumber}</span>
+            Your Application Number: <span className="font-bold">{appNo}</span>
           </p>
           <Link
             className="bg-indigo-700 hover:bg-indigo-800 text-white px-6 py-2 font-semibold rounded-md"
@@ -2405,7 +2488,7 @@ export default function StudentRegisterPortal() {
           >
             {"Go Home"}
           </Link>
-      </div>
+        </div>
       )}
     </main>
   );
