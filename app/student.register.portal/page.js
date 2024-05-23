@@ -108,6 +108,28 @@ export default function StudentRegisterPortal() {
     const [admitCard, setAdmitCard] = useState(null);
     const [registrationFormError, setRegistrationFormError] = useState("");
     const [admitCardError, setAdmitCardError] = useState("");
+    const [categoryCertificate, setCategoryCertificate] = useState(null);
+    const [validFields, setValidFields] = useState({
+      first_name: "",
+      middle_name: "",
+      surname: "",
+      father_first_name: "",
+      father_middle_name: "",
+      father_surname: "",
+      mother_first_name: "",
+      mother_middle_name: "",
+      mother_surname: "",
+      legible_postal_address: "",
+      legible_contact: "",
+      legible_email: "",
+      dob: "",
+    });
+    const [categoryCertificateError, setCategoryCertificateError] = useState("");
+    const [category, setCategory] = useState("General");
+    const [region, setRegion] = useState("");
+    const [paymentReceipt, setPaymentReceipt] = useState(null);
+    const [paymentReceiptError, setPaymentReceiptError] = useState("");
+
   
     useEffect(() => {
       if (!registrationForm) {
@@ -149,48 +171,7 @@ export default function StudentRegisterPortal() {
       []
     );
     const handleAdmitCardRemove = useCallback(() => setAdmitCard(null), []);
-  
-    const programmeOptions = useMemo(
-      () => [
-        { value: "", label: "Select Programme" },
-        { value: "B.Tech", label: "B.tech" },
-        { value: "L.E B.Tech", label: "(L.E) B.tech" },
-      ],
-      []
-    );
-  
-    const streamOptions = useMemo(
-      () => [
-        { value: "", label: "Select Stream" },
-        { value: "CSE", label: "CSE" },
-        { value: "IT", label: "IT" },
-        { value: "ECE", label: "ECE" },
-        { value: "EEE", label: "EEE" },
-      ],
-      []
-    );
 
-    const [categoryCertificate, setCategoryCertificate] = useState(null);
-    const [validFields, setValidFields] = useState({
-      first_name: "",
-      middle_name: "",
-      surname: "",
-      father_first_name: "",
-      father_middle_name: "",
-      father_surname: "",
-      mother_first_name: "",
-      mother_middle_name: "",
-      mother_surname: "",
-      legible_postal_address: "",
-      legible_contact: "",
-      legible_email: "",
-      dob: "",
-    });
-  
-    const [categoryCertificateError, setCategoryCertificateError] = useState("");
-    const [category, setCategory] = useState("General");
-    const [region, setRegion] = useState("");
-  
     const handleCategoryChange = (e) => {
       const selectedCategory = e.target.value;
       setCategory(selectedCategory);
@@ -261,10 +242,27 @@ export default function StudentRegisterPortal() {
         });
       }
     };
-
-    const [paymentReceipt, setPaymentReceipt] = useState(null);
-    const [paymentReceiptError, setPaymentReceiptError] = useState("");
   
+    const programmeOptions = useMemo(
+      () => [
+        { value: "", label: "Select Programme" },
+        { value: "B.Tech", label: "B.tech" },
+        { value: "L.E B.Tech", label: "(L.E) B.tech" },
+      ],
+      []
+    );
+  
+    const streamOptions = useMemo(
+      () => [
+        { value: "", label: "Select Stream" },
+        { value: "CSE", label: "CSE" },
+        { value: "IT", label: "IT" },
+        { value: "ECE", label: "ECE" },
+        { value: "EEE", label: "EEE" },
+      ],
+      []
+    );
+    
     const handleReceiptUpload = (e) => {
       const file = e.target.files[0];
       if (
