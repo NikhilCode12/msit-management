@@ -2,17 +2,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import axios from "axios";
+// import mongoose from "mongoose";
 
 export default function StudentRegisterPortal() {
-  const [formData, setFormData] = useState({
-    programmeDetails: {},
-    candidateDetails: {},
-    paymentDetails: {},
-    documentDetails: {},
-    declarationDetails: {},
-  });
-
-  const [passportPhoto, setPassportPhoto] = useState(null);
+  const [passportPhoto, setPassportPhoto] = useState("");
   const [btechChecked, setBtechChecked] = useState({
     cse_1st_shift: false,
     it_1st_shift: false,
@@ -83,11 +76,6 @@ export default function StudentRegisterPortal() {
     }
   };
 
-  const handlePassportPhotoUpload = (e) => {
-    const file = e.target.files[0];
-    setPassportPhoto(file);
-  };
-
   const handleFormSubmit = async (e) => {
     setLoading(true);
     e.preventDefault();
@@ -96,27 +84,38 @@ export default function StudentRegisterPortal() {
       alert("GGSIPU APPLICATION NUMBER IS REQUIRED!");
     } else {
       try {
-        const data = await axios.post(
+        const formData = {
+          programmeName,
+          stream,
+          shift,
+          appNo,
+          regDate,
+          rollNo,
+          rank,
+          ...validFields,
+          category,
+          region,
+          ...formValues,
+          registrationForm,
+          admitCard,
+          categoryCertificate,
+          marksheet_10: files["10th_marksheet"],
+          marksheet_12: files["12th_marksheet"],
+          diploma_certificate: files.diploma_certificate,
+          paymentReceipt,
+          candidateSignature,
+          parentSignature,
+          createdAt: currentDate,
+          applicationNumber: appNo,
+        };
+
+        const request = await axios.post(
           "https://backend-management-0xpn.onrender.com/submit-form",
-          {
-            programmeName,
-            stream,
-            shift,
-            appNo,
-            regDate,
-            rollNo,
-            rank,
-            ...validFields,
-            category,
-            region,
-            ...formValues,
-            applicationNumber: appNo,
-          }
+          formData
         );
 
-        if (data) {
+        if (request.status === 200) {
           setLoading(false);
-          alert("Form submitted successfully");
           setFormSubmitted(true);
         }
       } catch (err) {
@@ -124,11 +123,6 @@ export default function StudentRegisterPortal() {
       }
     }
   };
-
-  const handleRemovePhoto = () => {
-    setPassportPhoto(null);
-  };
-
   const [programmeName, setProgrammeName] = useState("");
   const [stream, setStream] = useState("");
   const [shift, setShift] = useState("");
@@ -136,11 +130,11 @@ export default function StudentRegisterPortal() {
   const [regDate, setRegDate] = useState("");
   const [rollNo, setRollNo] = useState("");
   const [rank, setRank] = useState("");
-  const [registrationForm, setRegistrationForm] = useState(null);
-  const [admitCard, setAdmitCard] = useState(null);
+  const [registrationForm, setRegistrationForm] = useState("");
+  const [admitCard, setAdmitCard] = useState("");
   const [registrationFormError, setRegistrationFormError] = useState("");
   const [admitCardError, setAdmitCardError] = useState("");
-  const [categoryCertificate, setCategoryCertificate] = useState(null);
+  const [categoryCertificate, setCategoryCertificate] = useState("");
   const [validFields, setValidFields] = useState({
     first_name: "",
     middle_name: "",
@@ -159,18 +153,22 @@ export default function StudentRegisterPortal() {
   const [categoryCertificateError, setCategoryCertificateError] = useState("");
   const [category, setCategory] = useState("General");
   const [region, setRegion] = useState("");
-  const [paymentReceipt, setPaymentReceipt] = useState(null);
+  const [paymentReceipt, setPaymentReceipt] = useState("");
   const [paymentReceiptError, setPaymentReceiptError] = useState("");
 
   useEffect(() => {
     if (!registrationForm) {
-      setRegistrationFormError("Please upload GGSIPU Registration Form.");
+      setRegistrationFormError(
+        "Please upload GGSIPU Registration Form Google Drive Link (Anyone with the link)."
+      );
     } else {
       setRegistrationFormError("");
     }
 
     if (!admitCard) {
-      setAdmitCardError("Please upload Admit Card.");
+      setAdmitCardError(
+        "Please upload Admit Card Google Drive Link (Anyone with the link)."
+      );
     } else {
       setAdmitCardError("");
     }
@@ -189,25 +187,19 @@ export default function StudentRegisterPortal() {
   );
   const handleRollNo = useCallback((e) => setRollNo(e.target.value), []);
   const handleRank = useCallback((e) => setRank(e.target.value), []);
-  const handleRegistrationFormUpload = useCallback(
-    (e) => setRegistrationForm(e.target.files[0]),
+  const handleRegistrationForm = useCallback(
+    (e) => setRegistrationForm(e.target.value),
     []
   );
-  const handleAdmitCardUpload = useCallback(
-    (e) => setAdmitCard(e.target.files[0]),
-    []
-  );
-  const handleRegistrationFormRemove = useCallback(
-    () => setRegistrationForm(null),
-    []
-  );
-  const handleAdmitCardRemove = useCallback(() => setAdmitCard(null), []);
+  const handleAdmitCard = useCallback((e) => setAdmitCard(e.target.value), []);
 
   const handleCategoryChange = (e) => {
     const selectedCategory = e.target.value;
     setCategory(selectedCategory);
     if (selectedCategory !== "General") {
-      setCategoryCertificateError("Please upload Category Certificate");
+      setCategoryCertificateError(
+        "Please upload Category Certificate Google Drive Link (Anyone with the link)"
+      );
     } else {
       setCategoryCertificateError("");
     }
@@ -220,33 +212,22 @@ export default function StudentRegisterPortal() {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.value;
     const selectedCategory = category;
     if (selectedCategory !== "General") {
-      if (file && file.type === "application/pdf") {
+      if (file == "") {
+        setCategoryCertificate(file);
+        setCategoryCertificateError(
+          "Please upload Category Certificate Google Drive Link (Anyone with the link) for the selected category."
+        );
+      } else {
         setCategoryCertificate(file);
         setCategoryCertificateError("");
-      } else {
-        if (!file) {
-          setCategoryCertificateError(
-            "Please upload a PDF file for the selected category!"
-          );
-        } else {
-          setCategoryCertificateError(
-            "Invalid file format for selected category. Please upload a PDF file!"
-          );
-        }
-        setCategoryCertificate(null);
       }
     } else {
+      setCategoryCertificate(file);
       setCategoryCertificateError("");
-      setCategoryCertificate(null);
-      validateForm();
     }
-  };
-
-  const handleRemoveFile = () => {
-    setCategoryCertificate(null);
   };
 
   const handleInputChange = (e) => {
@@ -294,36 +275,24 @@ export default function StudentRegisterPortal() {
     []
   );
 
-  const handleReceiptUpload = (e) => {
-    const file = e.target.files[0];
-    if (
-      file &&
-      (file.type === "application/pdf" || file.type.startsWith("image/"))
-    ) {
-      setPaymentReceipt(file);
-    } else {
-      alert("Please upload an image or a PDF file only!");
-    }
-  };
+  const handleReceipt = useCallback(
+    (e) => setPaymentReceipt(e.target.value),
+    []
+  );
 
   useEffect(() => {
     if (paymentReceipt) {
-      console.log(paymentReceipt);
       setPaymentReceiptError("");
     } else {
-      setPaymentReceiptError("Please upload Payment Receipt/Proof.");
+      setPaymentReceiptError(
+        "Please upload Payment Receipt/Proof Google Drive Link (Anyone with the link)."
+      );
     }
   }, [paymentReceipt]);
 
-  const handleRemoveReceipt = () => {
-    setPaymentReceipt(null);
-  };
-
   const [currentDate, setCurrentDate] = useState("");
-  const [candidateSignature, setCandidateSignature] = useState(null);
-  const [parentSignature, setParentSignature] = useState(null);
-  const [showCandidateCross, setShowCandidateCross] = useState(false);
-  const [showParentCross, setShowParentCross] = useState(false);
+  const [candidateSignature, setCandidateSignature] = useState("");
+  const [parentSignature, setParentSignature] = useState("");
   const [signatureErrors, setSignatureErrors] = useState({
     candidate: "",
     parent: "",
@@ -347,52 +316,45 @@ export default function StudentRegisterPortal() {
     const errors = {};
 
     if (!candidateSignature) {
-      errors.candidate = "Please upload Candidate's signature.";
+      errors.candidate =
+        "Please upload Candidate's signature Google Drive Link (Anyone with the link).";
     }
 
     if (!parentSignature) {
-      errors.parent = "Please upload Parent's signature.";
+      errors.parent =
+        "Please upload Parent's signature Google Drive Link (Anyone with the link).";
     }
 
     setSignatureErrors(errors);
   }, [candidateSignature, parentSignature]);
 
-  const handleDeclarationFileChange = (e, type) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (type === "candidate") {
-          setCandidateSignature(reader.result);
-          setShowCandidateCross(true);
-        } else if (type === "parent") {
-          setParentSignature(reader.result);
-          setShowParentCross(true);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const handleParentSignature = useCallback(
+    (e) => setParentSignature(e.target.value),
+    []
+  );
 
-  const handleRemoveImage = (type) => {
-    if (type === "candidate") {
-      setCandidateSignature(null);
-      setShowCandidateCross(false);
-    } else if (type === "parent") {
-      setParentSignature(null);
-      setShowParentCross(false);
-    }
-  };
+  const handleCandidateSignature = useCallback(
+    (e) => setCandidateSignature(e.target.value),
+    []
+  );
 
   const [files, setFiles] = useState({
-    "10th_marksheet": null,
-    "12th_marksheet": null,
-    diploma_certificate: null,
+    "10th_marksheet": "",
+    "12th_marksheet": "",
+    diploma_certificate: "",
   });
 
   const [marksheet_error_10, setMarksheetError_10] = useState("");
   const [marksheet_error_12, setMarksheetError_12] = useState("");
   const [diploma_certificate_error, setDiplomaCertificateError] = useState("");
+
+  const handleFileUpload = (e, key) => {
+    const value = e.target.value;
+    setFiles((prevFiles) => ({
+      ...prevFiles,
+      [key]: value,
+    }));
+  };
 
   const [formValues, setFormValues] = useState({
     board: "",
@@ -436,31 +398,22 @@ export default function StudentRegisterPortal() {
   useEffect(() => {
     if (!files["10th_marksheet"])
       setMarksheetError_10(
-        "Please upload 10th Marksheet and Passing Certificate."
+        "Please upload 10th Marksheet and Passing Certificate \n Google Drive Link (Anyone with the link)."
       );
     else setMarksheetError_10("");
 
     if (!files["12th_marksheet"])
       setMarksheetError_12(
-        "Please upload 12th Marksheet and Passing Certificate."
+        "Please upload 12th Marksheet and Passing Certificate \n Google Drive Link (Anyone with the link)."
       );
     else setMarksheetError_12("");
 
     if (!files["diploma_certificate"] && formValues.university !== "")
       setDiplomaCertificateError(
-        "Please upload Diploma Marksheet and Passing Certificate."
+        "Please upload Diploma Marksheet and Passing Certificate \n Google Drive Link (Anyone with the link)."
       );
     else setDiplomaCertificateError("");
   }, [formValues, files]);
-
-  const handleFileUpload = (e, type) => {
-    const file = e.target.files[0];
-    setFiles({ ...files, [type]: file });
-  };
-
-  const handleFileRemove = (type) => {
-    setFiles({ ...files, [type]: null });
-  };
 
   const handleFileInputChange = (e) => {
     const { name, value } = e.target;
@@ -822,7 +775,7 @@ export default function StudentRegisterPortal() {
               )}
               {/* GGSIPU Registration Form Upload */}
               <div className="w-full flex justify-center items-center">
-                <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+                <div className="w-[85%] flex flex-col gap-4 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                   <label
                     htmlFor="ggsipu_registration_form_upload"
                     className="w-2/3 text-left text-md font-medium"
@@ -831,37 +784,17 @@ export default function StudentRegisterPortal() {
                       "Please attach Duly Submitted Filled Up Online Registration Form of GGSIPU in the portal for relevant programmes. *"
                     }{" "}
                   </label>
-                  {registrationForm ? (
-                    <div className="flex items-center gap-2 ">
-                      <span className="bg-gray-100 rounded-md p-2">
-                        {registrationForm.name}
-                      </span>
-                      <button
-                        onClick={handleRegistrationFormRemove}
-                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      <input
-                        type="file"
-                        name="ggsipu_registration_form_upload"
-                        id="ggsipu_registration_form_upload"
-                        onChange={handleRegistrationFormUpload}
-                        accept=".pdf"
-                        className="hidden"
-                        required
-                      />
-                      <label
-                        htmlFor="ggsipu_registration_form_upload"
-                        className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
-                      >
-                        {"Upload Form"}
-                      </label>
-                    </div>
-                  )}
+                  <input
+                    type="text"
+                    name="ggsipu_registration_form_upload"
+                    id="ggsipu_registration_form_upload"
+                    value={registrationForm}
+                    onChange={handleRegistrationForm}
+                    autoComplete="off"
+                    placeholder="Enter Google Drive Link (Please select: Anyone with the link - Shareable)"
+                    className="py-1 px-3 w-[85%] border-2 rounded-md border-gray-400 outline-none text-md"
+                    required
+                  />
                 </div>
               </div>
               {/* Admit card missing error */}
@@ -872,44 +805,24 @@ export default function StudentRegisterPortal() {
               )}
               {/* Admit Card Upload */}
               <div className="w-full flex justify-center items-center">
-                <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+                <div className="w-[85%] flex flex-col gap-4 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                   <label
                     htmlFor="admit_card_upload"
                     className="w-2/3 text-left text-md font-medium"
                   >
                     {"Please attach Admit Card and Rank Proof. *"}{" "}
                   </label>
-                  {admitCard ? (
-                    <div className="flex items-center gap-2 ">
-                      <span className="bg-gray-100 rounded-md p-2">
-                        {admitCard.name}
-                      </span>
-                      <button
-                        onClick={handleAdmitCardRemove}
-                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      <input
-                        type="file"
-                        name="admit_card_upload"
-                        id="admit_card_upload"
-                        onChange={handleAdmitCardUpload}
-                        className="hidden"
-                        accept=".pdf"
-                        required
-                      />
-                      <label
-                        htmlFor="admit_card_upload"
-                        className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
-                      >
-                        {"Upload Admit Card"}
-                      </label>
-                    </div>
-                  )}
+                  <input
+                    type="text"
+                    name="admit_card_upload"
+                    id="admit_card_upload"
+                    onChange={handleAdmitCard}
+                    value={admitCard}
+                    autoComplete="off"
+                    placeholder="Enter Google Drive Link (Please select: Anyone with the link - Shareable)"
+                    className="py-1 px-3 w-[85%] border-2 rounded-md border-gray-400 outline-none text-md"
+                    required
+                  />
                 </div>
               </div>
             </div>
@@ -1209,7 +1122,7 @@ export default function StudentRegisterPortal() {
 
               {/* Category Certificate Attachment */}
               <div className="w-full flex justify-center items-center">
-                <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+                <div className="w-[85%] flex flex-col gap-4 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                   <label
                     htmlFor="category_certificate_upload"
                     className="w-2/3 text-left text-md font-medium"
@@ -1218,36 +1131,16 @@ export default function StudentRegisterPortal() {
                       "Please attach the Category Certificate (SC/ST/PWD/Entitlement Card (Defence)) along with the relevant Appendix format as per the GGSIPU Admission Brochure 2024-25 for claiming reservation."
                     }{" "}
                   </label>
-                  {categoryCertificate ? (
-                    <div className="flex items-center gap-2 ">
-                      <span className="bg-gray-100 rounded-md p-2">
-                        {categoryCertificate.name}
-                      </span>
-                      <button
-                        onClick={handleRemoveFile}
-                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      <input
-                        type="file"
-                        name="category_certificate_upload"
-                        id="category_certificate_upload"
-                        accept=".pdf"
-                        onChange={handleFileChange}
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="category_certificate_upload"
-                        className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
-                      >
-                        {"Upload Certificate"}
-                      </label>
-                    </div>
-                  )}
+                  <input
+                    type="text"
+                    name="category_certificate_upload"
+                    id="category_certificate_upload"
+                    onChange={handleFileChange}
+                    value={categoryCertificate}
+                    autoComplete="off"
+                    placeholder="Enter Google Drive Link (Please select: Anyone with the link - Shareable)"
+                    className="py-1 px-3 w-[85%] border-2 rounded-md border-gray-400 outline-none text-md"
+                  />
                 </div>
               </div>
               {/* Delhi/Outside Delhi Region */}
@@ -1534,46 +1427,26 @@ export default function StudentRegisterPortal() {
                 )}
                 {/* 10th Marksheet & Passing Certificate */}
                 <div className="w-full flex justify-center items-center mb-2">
-                  <div className="w-[90%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+                  <div className="w-[90%] flex flex-col gap-4 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                     <label
                       htmlFor="10th_marksheet_upload"
                       className="w-2/3 text-left text-md font-medium"
                     >
-                      {"Please attach 10th Marksheet & Passing Certificate. *"}{" "}
+                      {
+                        "Please attach 10th Marksheet & Passing Certificate Google Drive Link (Anyone with the link) *"
+                      }{" "}
                     </label>
-                    {files["10th_marksheet"] ? (
-                      <div className="flex items-center gap-2 ">
-                        <span className="bg-gray-100 rounded-md p-2">
-                          {files["10th_marksheet"].name}
-                        </span>
-                        <button
-                          onClick={() => handleFileRemove("10th_marksheet")}
-                          className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <div>
-                        <input
-                          type="file"
-                          name="10th_marksheet_upload"
-                          id="10th_marksheet_upload"
-                          accept=".pdf"
-                          onChange={(e) =>
-                            handleFileUpload(e, "10th_marksheet")
-                          }
-                          className="hidden"
-                          required
-                        />
-                        <label
-                          htmlFor="10th_marksheet_upload"
-                          className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
-                        >
-                          {"Upload Marksheet"}
-                        </label>
-                      </div>
-                    )}
+                    <input
+                      type="text"
+                      name="10th_marksheet_upload"
+                      id="10th_marksheet_upload"
+                      value={files["10th_marksheet"]}
+                      onChange={(e) => handleFileUpload(e, "10th_marksheet")}
+                      autoComplete="off"
+                      placeholder="Enter Google Drive Link (Please select: Anyone with the link - Shareable)"
+                      className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
+                      required
+                    />
                   </div>
                 </div>
               </div>
@@ -1813,45 +1686,24 @@ export default function StudentRegisterPortal() {
                 )}
                 {/* 12th Marksheet & Passing Certificate */}
                 <div className="w-full flex justify-center items-center mb-2">
-                  <div className="w-[90%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+                  <div className="w-[90%] flex flex-col gap-4 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                     <label
                       htmlFor="12th_marksheet_upload"
                       className="w-2/3 text-left text-md font-medium"
                     >
-                      {"Please attach 12th Marksheet & Passing Certificate. *"}{" "}
+                      {"Please attach 12th Marksheet & Passing Certificate."}{" "}
                     </label>
-                    {files["12th_marksheet"] ? (
-                      <div className="flex items-center gap-2 ">
-                        <span className="bg-gray-100 rounded-md p-2">
-                          {files["12th_marksheet"].name}
-                        </span>
-                        <button
-                          onClick={() => handleFileRemove("12th_marksheet")}
-                          className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <div>
-                        <input
-                          type="file"
-                          name="12th_marksheet_upload"
-                          id="12th_marksheet_upload"
-                          accept=".pdf"
-                          onChange={(e) =>
-                            handleFileUpload(e, "12th_marksheet")
-                          }
-                          className="hidden"
-                        />
-                        <label
-                          htmlFor="12th_marksheet_upload"
-                          className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
-                        >
-                          {"Upload Marksheet"}
-                        </label>
-                      </div>
-                    )}
+                    <input
+                      type="text"
+                      name="12th_marksheet_upload"
+                      id="12th_marksheet_upload"
+                      value={files["12th_marksheet"]}
+                      onChange={(e) => handleFileUpload(e, "12th_marksheet")}
+                      autoComplete="off"
+                      placeholder="Enter Google Drive Link (Please select: Anyone with the link - Shareable)"
+                      className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
+                      required
+                    />
                   </div>
                 </div>
               </div>
@@ -2074,49 +1926,27 @@ export default function StudentRegisterPortal() {
                 )}
                 {/* Diploma Marksheet & Passing Certificate */}
                 <div className="w-full flex justify-center items-center mb-2">
-                  <div className="w-[90%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+                  <div className="w-[90%] flex flex-col gap-4 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                     <label
                       htmlFor="diploma_certificate"
                       className="w-2/3 text-left text-md font-medium"
                     >
                       {
-                        "Please attach Diploma Marksheet of all semester examinations & Passing Certificate(for Lateral Entry). *"
+                        "Please attach Diploma Marksheet of all semester examinations & Passing Certificate(for Lateral Entry).*"
                       }{" "}
                     </label>
-                    {files["diploma_certificate"] ? (
-                      <div className="flex items-center gap-2 ">
-                        <span className="bg-gray-100 rounded-md p-2">
-                          {files["diploma_certificate"].name}
-                        </span>
-                        <button
-                          onClick={() =>
-                            handleFileRemove("diploma_certificate")
-                          }
-                          className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <div>
-                        <input
-                          type="file"
-                          name="diploma_certificate"
-                          id="diploma_certificate"
-                          accept=".pdf"
-                          onChange={(e) =>
-                            handleFileUpload(e, "diploma_certificate")
-                          }
-                          className="hidden"
-                        />
-                        <label
-                          htmlFor="diploma_certificate"
-                          className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
-                        >
-                          {"Upload Marksheet"}
-                        </label>
-                      </div>
-                    )}
+                    <input
+                      type="text"
+                      name="diploma_certificate"
+                      id="diploma_certificate"
+                      value={files.diploma_certificate}
+                      onChange={(e) =>
+                        handleFileUpload(e, "diploma_certificate")
+                      }
+                      autoComplete="off"
+                      placeholder="Enter Google Drive Link (Please select: Anyone with the link - Shareable)"
+                      className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
+                    />
                   </div>
                 </div>
               </div>
@@ -2167,44 +1997,23 @@ export default function StudentRegisterPortal() {
                     </p>
                   )}
                   <div className="w-full flex justify-center items-center mt-2">
-                    <div className="w-full flex gap-12 items-center justify-between bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+                    <div className="w-full flex flex-col gap-4 items-center justify-between bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                       <label
                         htmlFor="payment_receipt_upload"
-                        className="w-[70%] text-left text-md font-medium"
+                        className="w-full text-left text-md font-medium"
                       >
                         {"Please upload the Payment Receipt(Proof). *"}{" "}
                       </label>
-                      {paymentReceipt ? (
-                        <div className="flex items-center gap-2 ">
-                          <span className="bg-gray-100 rounded-md p-2">
-                            {paymentReceipt.name}
-                          </span>
-                          <button
-                            onClick={handleRemoveReceipt}
-                            className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="w-1/3 flex items-center justify-end">
-                          <input
-                            type="file"
-                            name="payment_receipt_upload"
-                            id="payment_receipt_upload"
-                            onChange={handleReceiptUpload}
-                            accept="image/*,.pdf"
-                            className="hidden"
-                            required
-                          />
-                          <label
-                            htmlFor="payment_receipt_upload"
-                            className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
-                          >
-                            {"Upload Receipt"}
-                          </label>
-                        </div>
-                      )}
+                      <input
+                        type="text"
+                        name="payment_receipt_upload"
+                        id="payment_receipt_upload"
+                        onChange={handleReceipt}
+                        autoComplete="off"
+                        placeholder="Enter Google Drive Link (Please select: Anyone with the link - Shareable)"
+                        className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
+                        required
+                      />
                     </div>
                   </div>
                 </div>
@@ -2246,43 +2055,17 @@ export default function StudentRegisterPortal() {
                       <label htmlFor="candidate_sign" className="mr-4">
                         {"Signature of the Candidate: "}
                       </label>
-                      {candidateSignature ? (
-                        <div className="relative">
-                          <img
-                            src={candidateSignature}
-                            alt="Candidate Signature"
-                            className="w-40 h-10 border border-black"
-                          />
-                          {showCandidateCross && (
-                            <button
-                              onClick={() => handleRemoveImage("candidate")}
-                              className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                            >
-                              &#x2715;
-                            </button>
-                          )}
-                        </div>
-                      ) : (
-                        <>
-                          <input
-                            type="file"
-                            name="candidate_sign"
-                            id="candidate_sign"
-                            accept="image/*"
-                            className="hidden"
-                            required
-                            onChange={(e) =>
-                              handleDeclarationFileChange(e, "candidate")
-                            }
-                          />
-                          <label
-                            htmlFor="candidate_sign"
-                            className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
-                          >
-                            {"Upload Signature"}
-                          </label>
-                        </>
-                      )}
+                      <input
+                        type="text"
+                        name="candidate_sign"
+                        id="candidate_sign"
+                        autoComplete="off"
+                        placeholder="Google Drive Link"
+                        value={candidateSignature}
+                        className="py-1 px-3 w-1/2 border-2 rounded-md border-gray-400 outline-none"
+                        required
+                        onChange={handleCandidateSignature}
+                      />
                     </div>
                   </div>
                   <p className="text-md font-medium text-justify my-2">
@@ -2312,43 +2095,19 @@ export default function StudentRegisterPortal() {
                       <label htmlFor="parent_sign" className="mr-4">
                         {"Signature of Father/Mother: "}
                       </label>
-                      {parentSignature ? (
-                        <div className="relative">
-                          <img
-                            src={parentSignature}
-                            alt="Parent Signature"
-                            className="w-40 h-10 border-black"
-                          />
-                          {showParentCross && (
-                            <button
-                              onClick={() => handleRemoveImage("parent")}
-                              className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                            >
-                              &#x2715;
-                            </button>
-                          )}
-                        </div>
-                      ) : (
-                        <>
-                          <input
-                            type="file"
-                            name="parent_sign"
-                            id="parent_sign"
-                            accept="image/*"
-                            className="hidden"
-                            required
-                            onChange={(e) =>
-                              handleDeclarationFileChange(e, "parent")
-                            }
-                          />
-                          <label
-                            htmlFor="parent_sign"
-                            className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
-                          >
-                            {"Upload Signature"}
-                          </label>
-                        </>
-                      )}
+                      <>
+                        <input
+                          type="text"
+                          name="parent_sign"
+                          id="parent_sign"
+                          autoComplete="off"
+                          value={parentSignature}
+                          placeholder="Google Drive Link"
+                          className="py-1 px-3 w-1/2 border-2 rounded-md border-gray-400 outline-none"
+                          required
+                          onChange={handleParentSignature}
+                        />
+                      </>
                     </div>
                   </div>
                 </div>
@@ -2420,46 +2179,24 @@ export default function StudentRegisterPortal() {
             </div>
             {/* Passport size photograph upload */}
             <div className="w-36 h-48 border outline-double border-indigo-900 flex flex-col justify-between items-center gap-4 absolute right-8 top-16 cursor-pointer">
-              {passportPhoto ? (
-                <>
-                  <div className="relative w-full h-full">
-                    <img
-                      src={URL.createObjectURL(passportPhoto)}
-                      alt="Passport Photo"
-                      className="object-cover w-full h-full"
-                    />
-                    <div className="absolute inset-0 flex justify-center items-end m-2">
-                      <button
-                        className="bg-red-500 text-white rounded-md py-1 w-full font-semibold hover:bg-red-600 active:bg-red-500"
-                        onClick={handleRemovePhoto}
-                      >
-                        {"Remove Photo"}
-                      </button>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    name="photo_upload"
-                    id="photo_upload"
-                    className="absolute inset-0 opacity-0"
-                    onChange={handlePassportPhotoUpload}
-                    required
-                  />
-                  <span className="text-sm text-left w-full px-3 py-4">
-                    {"Affix self-attested photograph"}
-                  </span>
-                  <label
-                    htmlFor="photo_upload"
-                    className="cursor-pointer z-10 bg-blue-500 text-white font-medium px-3 py-1 my-2 rounded-md hover:bg-blue-600 transition-colors"
-                  >
-                    {"Upload Photo"}
-                  </label>
-                </>
-              )}
+              <input
+                type="text"
+                name="photo_upload"
+                id="photo_upload"
+                className="text-sm absolute bottom-2 py-1 px-3 w-[80%] border-2 rounded-md border-gray-400 outline-none"
+                autoComplete="off"
+                placeholder="Drive Link"
+                onChange={(e) => {
+                  setPassportPhoto(e.target.value);
+                }}
+                value={passportPhoto}
+                required
+              />
+              <span className="text-sm text-left w-full px-3 py-4">
+                {
+                  "Affix self-attested photograph Google Drive Link (Anyone with the link)"
+                }
+              </span>
             </div>
           </form>
 
