@@ -105,14 +105,15 @@ export default function StudentRegisterPortal() {
           paymentReceipt,
           candidateSignature,
           parentSignature,
-          createdAt: currentDate,
           applicationNumber: appNo,
+          choices: {
+            btechChecked,
+            leToBtechChecked,
+          },
+          passportPhoto,
         };
 
-        const request = await axios.post(
-          "https://backend-management-0xpn.onrender.com/submit-form",
-          formData
-        );
+        const request = await axios.post("/api/submit-form", formData);
 
         if (request.status === 200) {
           setLoading(false);
@@ -1140,6 +1141,7 @@ export default function StudentRegisterPortal() {
                     autoComplete="off"
                     placeholder="Enter Google Drive Link (Please select: Anyone with the link - Shareable)"
                     className="py-1 px-3 w-[85%] border-2 rounded-md border-gray-400 outline-none text-md"
+                    disabled={category === "General"}
                   />
                 </div>
               </div>

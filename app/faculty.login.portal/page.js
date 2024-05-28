@@ -6,14 +6,30 @@ import axios from "axios";
 export default function FacultyPortal() {
   const [applicationNumber, setApplicationNumber] = useState("");
   const [studentData, setStudentData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [notFoundError, setNotFoundError] = useState("");
+  const [applicationNumberError, setApplicationNumberError] = useState("");
 
-  const handleSearch = async () => {
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!applicationNumber) {
+      setApplicationNumberError("Please enter!");
+      return;
+    }
     try {
-      const response = await axios.get(
-        `https://backend-management-0xpn.onrender.com/student?applicationNumber=${applicationNumber}`
-      );
-      console.log(response.data);
+      setIsLoading(true);
+      const response = await axios.get(`/api/student/${applicationNumber}`);
+      console.log(response.data.message);
+      if (response.data.message === "Student not found!") {
+        setIsLoading(false);
+        setNotFoundError(
+          "No such student found, try again with different application number!"
+        );
+        setStudentData(null);
+        return;
+      }
       setStudentData(response.data);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error searching for student:", error.message);
       setStudentData(null);
@@ -21,30 +37,76 @@ export default function FacultyPortal() {
   };
 
   return (
-    <main className="flex flex-col justify-center items-center w-full gap-12 mt-20 relative">
-      <div className="flex flex-col items-center gap-4">
+    <main
+      className={`flex flex-col justify-center items-center w-full gap-10 relative ${
+        studentData ? "mt-20" : "h-full"
+      }`}
+    >
+      <h1 className="text-3xl font-bold text-indigo-950 my-2">
+        {"Student Search"}
+      </h1>
+      <div className="flex  items-center gap-4 border-2 border-indigo-900 rounded-md p-12">
         <label htmlFor="applicationNumber" className="text-lg font-semibold">
-          Enter Student Application Number:
+          Student Application Number
         </label>
         <div className="flex items-center gap-2">
           <input
             type="text"
+            name="applicationNumber"
             id="applicationNumber"
             value={applicationNumber}
             autoComplete="off"
             onChange={(e) => setApplicationNumber(e.target.value)}
-            className="border border-gray-400 rounded-md px-3 py-2 outline-none"
+            className={`border rounded-md px-3 py-2 outline-none ${
+              applicationNumberError ? "border-red-400" : "border-gray-400"
+            }`}
+            placeholder={applicationNumberError}
             required
           />
           <button
-            type="button"
+            type="submit"
             onClick={handleSearch}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md font-semibold hover:bg-indigo-700"
+            disabled={isLoading}
+            className={`text-white py-2 px-6 rounded-lg font-medium text-md bg-indigo-900 hover:bg-indigo-700 active:bg-indigo-900 ${
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Search
+            {isLoading ? (
+              <div className="flex items-center">
+                Searching
+                <svg
+                  className="animate-spin ml-2 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8z"
+                  ></path>
+                </svg>
+              </div>
+            ) : (
+              "Search"
+            )}
           </button>
         </div>
       </div>
+
+      {notFoundError && (
+        <p className="w-2/3 flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+          {notFoundError}
+        </p>
+      )}
 
       {studentData && (
         <>
@@ -64,153 +126,193 @@ export default function FacultyPortal() {
             {"for the Academic Session 2024-25"}
           </div>
           {/* Programme Applied under 10% Management Quota */}
-          {/* <div className="w-2/3 flex flex-col items-start gap-4 text-md font-medium text-center mb-4 bg-purple-100 border-2 border-red-600 rounded-md px-6 py-4 pb-6 my-4">
-          <p className="font-medium text-center w-full">
-            {
-              "Please Tick on the Programme applied under 10% Management Quota"
-            }
-          </p>
-          <div className="w-full flex flex-col items-start">
-            <h2 className="underline underline-offset-4">
-              {"B.Tech. (First Year)"}
-            </h2>
-            <div className="grid grid-cols-4 gap-4 mt-4 text-md">
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="cse_1st_shift">{"CSE-1st Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="cse_1st_shift"
-                  checked={btechChecked.cse_1st_shift}
-                  onChange={handleBtechCheckboxChange}
-                />
+          <div className="w-2/3 flex flex-col items-start gap-4 text-md font-medium text-center mb-4 bg-purple-100 border-2 border-red-600 rounded-md px-6 py-4 pb-6 my-4">
+            <p className="font-medium text-center w-full">
+              {"Programme applied under 10% Management Quota"}
+            </p>
+            <div className="w-full flex flex-col items-start">
+              <h2 className="underline underline-offset-4">
+                {"B.Tech. (First Year)"}
+              </h2>
+              <div className="grid grid-cols-4 gap-4 mt-4 text-md">
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="cse_1st_shift">{"CSE-1st Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="cse_1st_shift"
+                    checked={studentData.choices.btechChecked.cse_1st_shift}
+                    disabled={!studentData.choices.btechChecked.cse_1st_shift}
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="it_1st_shift">{"IT-1st Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="it_1st_shift"
+                    checked={studentData.choices.btechChecked.it_1st_shift}
+                    disabled={!studentData.choices.btechChecked.it_1st_shift}
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="ece_1st_shift">{"ECE-1st Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="ece_1st_shift"
+                    checked={studentData.choices.btechChecked.ece_1st_shift}
+                    disabled={!studentData.choices.btechChecked.ece_1st_shift}
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="eee_1st_shift">{"EEE-1st Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="eee_1st_shift"
+                    checked={studentData.choices.btechChecked.eee_1st_shift}
+                    disabled={!studentData.choices.btechChecked.eee_1st_shift}
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="cse_2nd_shift">{"CSE-2nd Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="cse_2nd_shift"
+                    checked={studentData.choices.btechChecked.cse_2nd_shift}
+                    disabled={!studentData.choices.btechChecked.cse_2nd_shift}
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="it_2nd_shift">{"IT-2nd Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="it_2nd_shift"
+                    checked={studentData.choices.btechChecked.it_2nd_shift}
+                    disabled={!studentData.choices.btechChecked.it_2nd_shift}
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="ece_2nd_shift">{"ECE-2nd Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="ece_2nd_shift"
+                    checked={studentData.choices.btechChecked.ece_2nd_shift}
+                    disabled={!studentData.choices.btechChecked.ece_2nd_shift}
+                    readOnly
+                  />
+                </div>
               </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="it_1st_shift">{"IT-1st Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="it_1st_shift"
-                  checked={btechChecked.it_1st_shift}
-                  onChange={handleBtechCheckboxChange}
-                />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="ece_1st_shift">{"ECE-1st Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="ece_1st_shift"
-                  checked={btechChecked.ece_1st_shift}
-                  onChange={handleBtechCheckboxChange}
-                />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="eee_1st_shift">{"EEE-1st Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="eee_1st_shift"
-                  checked={btechChecked.eee_1st_shift}
-                  onChange={handleBtechCheckboxChange}
-                />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="cse_2nd_shift">{"CSE-2nd Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="cse_2nd_shift"
-                  checked={btechChecked.cse_2nd_shift}
-                  onChange={handleBtechCheckboxChange}
-                />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="it_2nd_shift">{"IT-2nd Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="it_2nd_shift"
-                  checked={btechChecked.it_2nd_shift}
-                  onChange={handleBtechCheckboxChange}
-                />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="ece_2nd_shift">{"ECE-2nd Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="ece_2nd_shift"
-                  checked={btechChecked.ece_2nd_shift}
-                  onChange={handleBtechCheckboxChange}
-                />
+            </div>
+            <div className="w-full flex flex-col items-start">
+              <h2 className="underline underline-offset-4">
+                {"LE to B.Tech. (Second Year)"}
+              </h2>
+              <div className="grid grid-cols-4 gap-4 mt-4 text-md">
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="cse_1st_shift_le">{"CSE-1st Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="cse_1st_shift_le"
+                    checked={
+                      studentData.choices.leToBtechChecked.cse_1st_shift_le
+                    }
+                    disabled={
+                      !studentData.choices.leToBtechChecked.cse_1st_shift_le
+                    }
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="it_1st_shift_le">{"IT-1st Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="it_1st_shift_le"
+                    checked={
+                      studentData.choices.leToBtechChecked.it_1st_shift_le
+                    }
+                    disabled={
+                      !studentData.choices.leToBtechChecked.it_1st_shift_le
+                    }
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="ece_1st_shift_le">{"ECE-1st Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="ece_1st_shift_le"
+                    checked={
+                      studentData.choices.leToBtechChecked.ece_1st_shift_le
+                    }
+                    disabled={
+                      !studentData.choices.leToBtechChecked.ece_1st_shift_le
+                    }
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="eee_1st_shift_le">{"EEE-1st Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="eee_1st_shift_le"
+                    checked={
+                      studentData.choices.leToBtechChecked.eee_1st_shift_le
+                    }
+                    disabled={
+                      !studentData.choices.leToBtechChecked.eee_1st_shift_le
+                    }
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="cse_2nd_shift_le">{"CSE-2nd Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="cse_2nd_shift_le"
+                    checked={
+                      studentData.choices.leToBtechChecked.cse_2nd_shift_le
+                    }
+                    disabled={
+                      !studentData.choices.leToBtechChecked.cse_2nd_shift_le
+                    }
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="it_2nd_shift_le">{"IT-2nd Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="it_2nd_shift_le"
+                    checked={
+                      studentData.choices.leToBtechChecked.it_2nd_shift_le
+                    }
+                    disabled={
+                      !studentData.choices.leToBtechChecked.it_2nd_shift_le
+                    }
+                    readOnly
+                  />
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <label htmlFor="ece_2nd_shift_le">{"ECE-2nd Shift"}</label>
+                  <input
+                    type="checkbox"
+                    name="ece_2nd_shift_le"
+                    checked={
+                      studentData.choices.leToBtechChecked.ece_2nd_shift_le
+                    }
+                    disabled={
+                      !studentData.choices.leToBtechChecked.ece_2nd_shift_le
+                    }
+                    readOnly
+                  />
+                </div>
               </div>
             </div>
           </div>
-          <div className="w-full flex flex-col items-start">
-            <h2 className="underline underline-offset-4">
-              {"LE to B.Tech. (Second Year)"}
-            </h2>
-            <div className="grid grid-cols-4 gap-4 mt-4 text-md">
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="cse_1st_shift_le">{"CSE-1st Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="cse_1st_shift_le"
-                  checked={leToBtechChecked.cse_1st_shift_le}
-                  onChange={handleLeToBtechCheckboxChange}
-                />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="it_1st_shift_le">{"IT-1st Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="it_1st_shift_le"
-                  checked={leToBtechChecked.it_1st_shift_le}
-                  onChange={handleLeToBtechCheckboxChange}
-                />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="ece_1st_shift_le">{"ECE-1st Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="ece_1st_shift_le"
-                  checked={leToBtechChecked.ece_1st_shift_le}
-                  onChange={handleLeToBtechCheckboxChange}
-                />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="eee_1st_shift_le">{"EEE-1st Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="eee_1st_shift_le"
-                  checked={leToBtechChecked.eee_1st_shift_le}
-                  onChange={handleLeToBtechCheckboxChange}
-                />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="cse_2nd_shift_le">{"CSE-2nd Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="cse_2nd_shift_le"
-                  checked={leToBtechChecked.cse_2nd_shift_le}
-                  onChange={handleLeToBtechCheckboxChange}
-                />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="it_2nd_shift_le">{"IT-2nd Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="it_2nd_shift_le"
-                  checked={leToBtechChecked.it_2nd_shift_le}
-                  onChange={handleLeToBtechCheckboxChange}
-                />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <label htmlFor="ece_2nd_shift_le">{"ECE-2nd Shift"}</label>
-                <input
-                  type="checkbox"
-                  name="ece_2nd_shift_le"
-                  checked={leToBtechChecked.ece_2nd_shift_le}
-                  onChange={handleLeToBtechCheckboxChange}
-                />
-              </div>
-            </div>
-          </div>
-        </div> */}
           {/* Program Details Component*/}
           <div className="w-full flex flex-col justify-center items-center gap-6">
             {/* Programme Name */}
@@ -321,12 +423,12 @@ export default function FacultyPortal() {
                 className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
               />
             </div>
-            {/* Registration form missing error
-            {studentData.registrationForm && (
+            {/* Registration form missing error */}
+            {!studentData.registrationForm && (
               <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
                 {`Registration form missing`}
               </p>
-            )} */}
+            )}
             {/* GGSIPU Registration Form Upload */}
             <div className="w-full flex justify-center items-center">
               <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
@@ -336,9 +438,13 @@ export default function FacultyPortal() {
                 ></label>
                 {studentData.registrationForm ? (
                   <div className="flex items-center gap-2 ">
-                    <span className="bg-gray-100 rounded-md p-2">
-                      {studentData.registrationForm.name}
-                    </span>
+                    <Link
+                      className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                      href={studentData.registrationForm}
+                      target="_blank"
+                    >
+                      {"Registration Form"}
+                    </Link>
                   </div>
                 ) : (
                   <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
@@ -1529,28 +1635,6 @@ export default function FacultyPortal() {
             </div>
           </div>
 
-          {/* External Reference to msit.in */}
-          <p className="text-md font-medium">
-            {
-              "For more information, please refer to MSIT website on day-day-basis at "
-            }
-            <Link
-              href={"https://www.msit.in"}
-              target="_blank"
-              className=" text-green-600 hover:text-green-700 active:text-green-600"
-            >
-              {"www.msit.in"}
-            </Link>{" "}
-            {" or visit "}{" "}
-            <Link
-              href={"https://www.ipu.ac.in"}
-              target="_blank"
-              className=" text-green-600 hover:text-green-700 active:text-green-600"
-            >
-              {"www.ipu.ac.in"}
-            </Link>
-          </p>
-
           {/* Form No */}
           <div className="hidden border-2 border-indigo-900 flex items-center justify-between gap-2 absolute left-8 top-16 px-4 py-2 rounded-lg">
             <p className="text-md">{"Application No. "}</p>
@@ -1561,15 +1645,9 @@ export default function FacultyPortal() {
           {/* Passport size photograph upload */}
           <div className="w-36 h-48 border outline-double border-indigo-900 flex flex-col justify-between items-center gap-4 absolute right-8 top-40 cursor-pointer">
             {studentData.passportPhoto ? (
-              <>
-                <div className="relative w-full h-full">
-                  <img
-                    src={URL.createObjectURL(studentData.passportPhoto)}
-                    alt="Passport Photo"
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-              </>
+              <div className="relative w-auto h-full">
+                {studentData.passportPhoto}
+              </div>
             ) : (
               <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
                 {"Student Passport Photo Missing"}
