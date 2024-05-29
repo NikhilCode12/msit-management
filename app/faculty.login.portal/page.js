@@ -9,8 +9,12 @@ export default function FacultyPortal() {
   const [isLoading, setIsLoading] = useState(false);
   const [notFoundError, setNotFoundError] = useState("");
   const [applicationNumberError, setApplicationNumberError] = useState("");
-  const [formattedRegDate, setFormattedRegDate] = useState("");
-  const [createdDate, setCreatedRegDate] = useState("");
+
+  const formattedDate = (dateString) => {
+    const [year, month, day] = dateString.split("-");
+    return `${day}/${month}/${year}`;
+  };
+
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!applicationNumber) {
@@ -36,16 +40,6 @@ export default function FacultyPortal() {
       setStudentData(null);
     }
   };
-  useEffect(() => {
-    if (studentData && studentData.regDate && studentData.createdAt && studentData.passportPhoto) {
-      const regDate = new Date(studentData.regDate);
-      const createdDate = new Date(studentData.createdAt)
-      const formattedReg = regDate.toISOString().split('T')[0];
-      const formattedCreated = createdDate.toISOString().split('T')[0];
-      setFormattedRegDate(formattedReg);
-      setCreatedRegDate(formattedCreated);
-    }
-  }, [studentData]);
 
   return (
     <main
@@ -113,7 +107,7 @@ export default function FacultyPortal() {
         </div>
       </div>
 
-      {notFoundError && (
+      {notFoundError && studentData && (
         <p className="w-2/3 flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
           {notFoundError}
         </p>
@@ -125,7 +119,7 @@ export default function FacultyPortal() {
           <h2 className="text-3xl font-bold text-indigo-900">
             Management Quota Application Form{" (2024-2025)"}
           </h2>
-          <div className="flex items-center justify-center text-center w-2/3 underline underline-offset-2 bg-purple-200 px-6 py-4 font-medium text-md border-2 border-indigo-900 rounded-lg mt-20">
+          <div className="flex items-center justify-center text-center w-2/3 underline underline-offset-2 bg-purple-200 px-6 py-4 font-medium text-md border-2 border-indigo-900 rounded-lg mt-10">
             {
               "Application Form for Admission under Management Quota Seats of GGSIPU, Delhi in"
             }{" "}
@@ -334,35 +328,39 @@ export default function FacultyPortal() {
               >
                 {"Programme Name *"}
               </label>
-              <select name="programme_name" id="programme_name" className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md">
-                <option>{studentData.programmeName}</option>
-              </select>
+              <div
+                name="programme_name"
+                id="programme_name"
+                className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
+              >
+                {studentData.programmeName}
+              </div>
             </div>
             {/* Stream */}
             <div className="w-full flex justify-center items-center">
               <label htmlFor="stream" className="text-md w-1/3 font-semibold">
                 {"Stream *"}
               </label>
-              <select
+              <div
                 name="stream"
                 id="stream"
                 className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
               >
-                <option>{studentData.stream}</option>
-              </select>
+                {studentData.stream}
+              </div>
             </div>
             {/* Preferred Choice of shift */}
             <div className="w-full flex justify-center items-center">
               <label htmlFor="stream" className="text-md w-1/3 font-semibold">
                 {"Preferred Choice of Shift *"}
               </label>
-              <select
+              <div
                 name="shift"
                 id="shift"
                 className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
               >
-                <option>{studentData.shift}</option>
-              </select>
+                {studentData.shift}
+              </div>
             </div>
             {/* GGSIPU Registration Number */}
             <div className="w-full flex justify-center items-center">
@@ -372,15 +370,13 @@ export default function FacultyPortal() {
               >
                 {"GGSIPU Online Application Form (Registration No.) *"}
               </label>
-              <input
-                type="text"
+              <div
                 name="ggsipu_registration_no"
                 id="GGSIPU_Registration_No"
-                autoComplete="off"
-                value={studentData.appNo}
                 className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                required
-              />
+              >
+                {studentData.appNo}
+              </div>
             </div>
             {/* Registration Date */}
             <div className="w-full flex justify-center items-center">
@@ -390,15 +386,13 @@ export default function FacultyPortal() {
               >
                 {"Registration Date *"}
               </label>
-              <input
-                type="date"
+              <div
                 name="registration_date"
                 id="Registration_Date"
-                autoComplete="off"
-                value={formattedRegDate}
                 className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                required
-              />
+              >
+                {formattedDate(studentData.regDate)}
+              </div>
             </div>
             {/* Roll NO CET/JEE LE */}
             <div className="w-full flex justify-center items-center">
@@ -408,14 +402,13 @@ export default function FacultyPortal() {
               >
                 {"NLT(JEE)/CET Roll No.(L.E.)"}
               </label>
-              <input
-                type="text"
+              <div
                 name="jee_cet_rollno"
                 id="jee_cet_rollno"
-                autoComplete="off"
-                value={studentData.rollNo}
                 className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
-              />
+              >
+                {studentData.rollNo}
+              </div>
             </div>
             {/* Rank CET/JEE LE */}
             <div className="w-full flex justify-center items-center">
@@ -425,14 +418,13 @@ export default function FacultyPortal() {
               >
                 {"NLT(JEE)/CET (LE)Rank"}
               </label>
-              <input
-                type="number"
+              <div
                 name="jee_cet_rank"
                 id="jee_cet_rank"
-                autoComplete="off"
-                value={studentData.rank}
                 className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
-              />
+              >
+                {studentData.rank}
+              </div>
             </div>
             {/* Registration form missing error */}
             {!studentData.registrationForm && (
@@ -441,23 +433,25 @@ export default function FacultyPortal() {
               </p>
             )}
             {/* GGSIPU Registration Form Upload */}
-            <div className="w-full flex justify-center items-center">
-              <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+            <div className="w-[80%] flex justify-center items-center">
+              <div className="w-[85%] flex gap-12 items-center justify-between bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                 <label
                   htmlFor="ggsipu_registration_form_upload"
-                  className="w-1/2 text-left text-md font-bold text-2xl"
+                  className="w-1/3 text-left text-md font-medium"
                 >
-                  {"Registration Form Link"}
+                  {
+                    "Attached Duly Submitted Filled Up Online Registration Form of GGSIPU in the portal for relevant programmes. *"
+                  }{" "}
                 </label>
                 {studentData.registrationForm ? (
                   <div className="flex items-center gap-2 ">
-                    <p className="w-[150px] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                    <p className="w-[250px] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
                       <Link
                         className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
                         href={studentData.registrationForm}
                         target="_blank"
                       >
-                        {"Registration Form"}
+                        {"Download Registration Form"}
                       </Link>
                     </p>
                   </div>
@@ -468,30 +462,24 @@ export default function FacultyPortal() {
                 )}
               </div>
             </div>
-            {/* Admit card missing error
-            {admitCardError && (
-              <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                {admitCardError}
-              </p>
-            )} */}
             {/* Admit Card Upload */}
-            <div className="w-full flex justify-center items-center">
-              <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+            <div className="w-[80%] flex justify-center items-center">
+              <div className="w-[85%] flex gap-12 items-center justify-between bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                 <label
                   htmlFor="ggsipu_registration_form_upload"
-                  className="w-1/2 text-left text-md font-bold text-2xl"
+                  className="w-2/3 text-left text-md font-medium"
                 >
-                  {"Admit Card Link"}
+                  {"Attached Admit Card and Rank Proof. *"}{" "}
                 </label>
                 {studentData.admitCard ? (
                   <div className="flex items-center gap-2 ">
-                    <p className="w-[150px] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                    <p className="w-[250px] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
                       <Link
                         className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
                         href={studentData.admitCard}
                         target="_blank"
                       >
-                        {"Admit Card"}
+                        {"Download Admit Card"}
                       </Link>
                     </p>
                   </div>
@@ -518,32 +506,17 @@ export default function FacultyPortal() {
                 {"Candidate's Name *"}
               </label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
-                <input
-                  type="text"
+                <div
                   name="first_name"
                   id="first_name"
-                  autoComplete="off"
-                  value={studentData.first_name}
-                  required
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="text"
-                  name="middle_name"
-                  id="middle_name"
-                  autoComplete="off"
-                  value={studentData.middle_name}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="text"
-                  name="surname"
-                  id="surname"
-                  autoComplete="off"
-                  value={studentData.surname}
-                  required
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
+                  className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
+                >
+                  {studentData.first_name +
+                    "" +
+                    studentData.middle_name +
+                    " " +
+                    studentData.surname}
+                </div>
               </div>
             </div>
             {/* Father's Name */}
@@ -555,32 +528,13 @@ export default function FacultyPortal() {
                 {"Father's Name *"}
               </label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
-                <input
-                  type="text"
-                  name="father_first_name"
-                  id="father_first_name"
-                  autoComplete="off"
-                  value={studentData.father_first_name}
-                  required
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="text"
-                  name="father_middle_name"
-                  id="father_middle_name"
-                  autoComplete="off"
-                  value={studentData.father_middle_name}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="text"
-                  name="father_surname"
-                  id="father_surname"
-                  autoComplete="off"
-                  value={studentData.father_surname}
-                  required
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
+                <div className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md">
+                  {studentData.father_first_name +
+                    "" +
+                    studentData.father_middle_name +
+                    " " +
+                    studentData.father_surname}
+                </div>
               </div>
             </div>
             {/* Mother's Name */}
@@ -592,32 +546,13 @@ export default function FacultyPortal() {
                 {"Mother's Name *"}
               </label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
-                <input
-                  type="text"
-                  name="mother_first_name"
-                  id="mother_first_name"
-                  autoComplete="off"
-                  value={studentData.mother_first_name}
-                  required
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="text"
-                  name="mother_middle_name"
-                  id="mother_middle_name"
-                  autoComplete="off"
-                  value={studentData.mother_middle_name}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="text"
-                  name="mother_surname"
-                  id="mother_surname"
-                  autoComplete="off"
-                  value={studentData.mother_surname}
-                  required
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
+                <div className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md">
+                  {studentData.mother_first_name +
+                    "" +
+                    studentData.mother_middle_name +
+                    " " +
+                    studentData.mother_surname}
+                </div>
               </div>
             </div>
             {/* Legible Postal Address */}
@@ -625,17 +560,13 @@ export default function FacultyPortal() {
               <label
                 htmlFor="legible_postal_address"
                 className="text-md w-1/3 font-semibold"
-              >{"Legible Postal Address"}</label>
+              >
+                {"Legible Postal Address"}
+              </label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
-                <input
-                  type="text"
-                  name="legible_postal_address"
-                  id="legible_postal_address"
-                  autoComplete="off"
-                  value={studentData.legible_postal_address}
-                  required
-                  className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
-                />
+                <div className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md">
+                  {studentData.legible_postal_address}
+                </div>
               </div>
             </div>
             {/* Legible Contact Nos. and Email I.D. */}
@@ -643,17 +574,13 @@ export default function FacultyPortal() {
               <label
                 htmlFor="legible_contact"
                 className="text-md w-1/3 font-semibold"
-              >{"Legible Contact No."}</label>
+              >
+                {"Legible Contact No."}
+              </label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
-                <input
-                  type="number"
-                  name="legible_contact"
-                  id="legible_contact"
-                  autoComplete="off"
-                  value={studentData.legible_contact}
-                  required
-                  className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
-                />
+                <div className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md">
+                  {studentData.legible_contact}
+                </div>
               </div>
             </div>
             {/* Legible Email I.D. */}
@@ -661,17 +588,13 @@ export default function FacultyPortal() {
               <label
                 htmlFor="legible_email"
                 className="text-md w-1/3 font-semibold"
-              >{"Legible Email I.D."}</label>
+              >
+                {"Legible Email I.D."}
+              </label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
-                <input
-                  type="email"
-                  name="legible_email"
-                  id="legible_email"
-                  autoComplete="off"
-                  value={studentData.legible_email}
-                  required
-                  className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
-                />
+                <div className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md">
+                  {studentData.legible_email}
+                </div>
               </div>
             </div>
             {/* Date of Birth (in Christian Era) */}
@@ -680,15 +603,9 @@ export default function FacultyPortal() {
                 {"Date of Birth (in Christian Era) *"}
               </label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
-                <input
-                  type="date"
-                  name="dob"
-                  id="dob"
-                  autoComplete="off"
-                  value={studentData.dob}
-                  required
-                  className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
-                />
+                <div className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md">
+                  {formattedDate(studentData.dob)}
+                </div>
               </div>
             </div>
             {/* Category Selection for Reservation */}
@@ -697,51 +614,43 @@ export default function FacultyPortal() {
                 {"Category"}
               </label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
-                <input
-                  type="text"
-                  name="category"
-                  id="category"
-                  autoComplete="off"
-                  value={studentData.category}
-                  required
-                  className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
-                />
+                <div className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md">
+                  {studentData.category}
+                </div>
               </div>
             </div>
-            {/* {categoryCertificateError && (
-              <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                {categoryCertificateError}
-              </p>
-            )} */}
-
             {/* Category Certificate Attachment */}
-            <div className="w-full flex justify-center items-center">
-              <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
-                <label
-                  htmlFor="category_certificate_link"
-                  className="w-1/2 text-left text-md font-bold text-2xl"
-                >
-                  {"Category Certificate Link"}
-                </label>
-                {studentData.category_certificate ? (
-                  <div className="flex items-center gap-2 ">
-                    <p className="w flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                      <Link
-                        className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
-                        href={studentData.category_certificate}
-                        target="_blank"
-                      >
-                        {"Category Certificate"}
-                      </Link>
+            {studentData.category_certificate && (
+              <div className="w-full flex justify-center items-center">
+                <div className="w-[85%] flex gap-12 items-center justify-between bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+                  <label
+                    htmlFor="category_certificate_link"
+                    className="w-2/3 text-left text-md font-medium"
+                  >
+                    {
+                      "Attached Category Certificate (SC/ST/PWD/Entitlement Card (Defence)) along with the relevant Appendix format as per the GGSIPU Admission Brochure 2024-25 for claiming reservation."
+                    }{" "}
+                  </label>
+                  {studentData.category_certificate ? (
+                    <div className="flex items-center gap-2 ">
+                      <p className="w flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                        <Link
+                          className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                          href={studentData.category_certificate}
+                          target="_blank"
+                        >
+                          {"Category Certificate"}
+                        </Link>
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                      {`Category Certificate missing`}
                     </p>
-                  </div>
-                ) : (
-                  <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                    {`Category Certificate missing`}
-                  </p>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            )}
             {/* Delhi/Outside Delhi Region */}
             <div className="w-full flex justify-center items-center">
               <label htmlFor="region" className="text-md w-1/3 font-semibold">
@@ -750,28 +659,9 @@ export default function FacultyPortal() {
                 }
               </label>
               <div className="w-1/2 flex gap-4 items-center justify-center">
-                {/* Delhi Region*/}
-                <input
-                  type="radio"
-                  name="region"
-                  id="delhi"
-                  value="Delhi"
-                  checked={studentData.region === "Delhi"}
-                />
-                <label htmlFor="delhi" className="ml-2">
-                  {"Delhi Region"}
-                </label>
-                {/* Outside Delhi Region */}
-                <input
-                  type="radio"
-                  name="region"
-                  id="outside_delhi"
-                  value="Outside Delhi"
-                  checked={studentData.region === "Outside Delhi"}
-                />
-                <label htmlFor="outside_delhi" className="ml-2">
-                  {"Outside Delhi Region"}
-                </label>
+                <div className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md">
+                  {studentData.region + " Region"}
+                </div>
               </div>
             </div>
           </div>
@@ -797,15 +687,9 @@ export default function FacultyPortal() {
                   >
                     {"Board *"}
                   </label>
-                  <input
-                    type="text"
-                    name="board"
-                    id="board"
-                    value={studentData.board}
-                    autoComplete="off"
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.board}
+                  </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
                   <label
@@ -826,25 +710,17 @@ export default function FacultyPortal() {
                 </div>
               </div>
               {/* year */}
-              <div className="w-[73%] flex justify-left items-center">
+              <div className="w-[71%] flex justify-left items-center">
                 <div className="w-1/3 flex justify-between items-center">
                   <label
                     htmlFor="year"
-                    className="text-md w-1/3 font-semibold mr-10"
+                    className="text-md w-1/3 font-semibold mr-16"
                   >
                     {"Year *"}
                   </label>
-                  <input
-                    type="number"
-                    name="year"
-                    id="year"
-                    autoComplete="off"
-                    maxLength={4}
-                    value={studentData.year}
-                    max={2024}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.year}
+                  </div>
                 </div>
               </div>
               {/* Subjects and marks */}
@@ -857,15 +733,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 1"}
                   </label>
-                  <input
-                    type="text"
-                    name="subject_1"
-                    id="subject_1"
-                    autoComplete="off"
-                    value={studentData.subject_1}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_1}
+                  </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
                   <label
@@ -874,15 +744,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 2"}
                   </label>
-                  <input
-                    type="number"
-                    name="subject_2"
-                    id="subject_2"
-                    autoComplete="off"
-                    value={studentData.subject_2}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_2}
+                  </div>
                 </div>
               </div>
               {/* Subject 3 and 4 */}
@@ -894,15 +758,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 3"}
                   </label>
-                  <input
-                    type="number"
-                    name="subject_3"
-                    id="subject_3"
-                    autoComplete="off"
-                    value={studentData.subject_3}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_3}
+                  </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
                   <label
@@ -911,15 +769,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 4"}
                   </label>
-                  <input
-                    type="number"
-                    name="subject_4"
-                    id="subject_4"
-                    autoComplete="off"
-                    value={studentData.subject_4}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_4}
+                  </div>
                 </div>
               </div>
               {/* Subject 5 and 6 */}
@@ -931,15 +783,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 5"}
                   </label>
-                  <input
-                    type="number"
-                    name="subject_5"
-                    id="subject_5"
-                    autoComplete="off"
-                    value={studentData.subject_5}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_5}
+                  </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
                   <label
@@ -948,14 +794,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 6"}
                   </label>
-                  <input
-                    type="number"
-                    name="subject_6"
-                    id="subject_6"
-                    autoComplete="off"
-                    value={studentData.subject_6}
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_6 || "......"}
+                  </div>
                 </div>
               </div>
               {/* Total marks and Percentage*/}
@@ -967,15 +808,9 @@ export default function FacultyPortal() {
                   >
                     {"Total Marks *"}
                   </label>
-                  <input
-                    type="number"
-                    name="total_marks"
-                    id="total_marks"
-                    autoComplete="off"
-                    value={studentData.total_marks}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.total_marks}
+                  </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
                   <label
@@ -984,30 +819,21 @@ export default function FacultyPortal() {
                   >
                     {"Percentage *"}
                   </label>
-                  <input
-                    type="number"
-                    name="total_percentage"
-                    id="total_percentage"
-                    autoComplete="off"
-                    value={studentData.total_percentage}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.total_percentage}
+                  </div>
                 </div>
               </div>
-              {/* {marksheet_error_10 && (
-                <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                  {marksheet_error_10}
-                </p>
-              )} */}
               {/* 10th Marksheet & Passing Certificate */}
-              <div className="w-full flex justify-center items-center">
-                <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+              <div className="w-[85%] flex justify-center items-center">
+                <div className="w-[85%] flex gap-12 items-center justify-between bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                   <label
                     htmlFor="10th_marksheet_upload"
-                    className="w-1/2 text-left text-md font-bold text-2xl"
+                    className="w-2/3 text-left text-md font-medium"
                   >
-                    {"10th Marksheet Link"}
+                    {
+                      "Attached 10th Marksheet & Passing Certificate Google Drive Link (Anyone with the link) *"
+                    }{" "}
                   </label>
                   {studentData.marksheet_10 ? (
                     <div className="flex items-center gap-2 ">
@@ -1017,7 +843,7 @@ export default function FacultyPortal() {
                           href={studentData.marksheet_10}
                           target="_blank"
                         >
-                          {"10th Marksheet"}
+                          {"Download 10th Marksheet"}
                         </Link>
                       </p>
                     </div>
@@ -1043,15 +869,9 @@ export default function FacultyPortal() {
                   >
                     {"Board *"}
                   </label>
-                  <input
-                    type="text"
-                    name="board_12"
-                    id="board_12"
-                    autoComplete="off"
-                    value={studentData.board_12}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.board_12}
+                  </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
                   <label
@@ -1060,37 +880,23 @@ export default function FacultyPortal() {
                   >
                     {"Roll No. *"}
                   </label>
-                  <input
-                    type="number"
-                    name="roll_no_12"
-                    id="roll_no_12"
-                    autoComplete="off"
-                    value={studentData.roll_no_12}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.roll_no_12}
+                  </div>
                 </div>
               </div>
               {/* year */}
-              <div className="w-[73%] flex justify-left items-center">
+              <div className="w-[71%] flex justify-left items-center">
                 <div className="w-1/3 flex justify-between items-center">
                   <label
                     htmlFor="year_12"
-                    className="text-md w-1/3 font-semibold mr-10"
+                    className="text-md w-1/3 font-semibold mr-16"
                   >
                     {"Year *"}
                   </label>
-                  <input
-                    type="number"
-                    name="year_12"
-                    id="year_12"
-                    autoComplete="off"
-                    maxLength={4}
-                    max={2024}
-                    value={studentData.year_12}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.year_12}
+                  </div>
                 </div>
               </div>
               {/* Subjects and marks */}
@@ -1103,15 +909,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 1"}
                   </label>
-                  <input
-                    type="text"
-                    name="subject_1_12"
-                    id="subject_1_12"
-                    autoComplete="off"
-                    value={studentData.subject_1_12}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_1_12}
+                  </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
                   <label
@@ -1120,15 +920,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 2"}
                   </label>
-                  <input
-                    type="number"
-                    name="subject_2_12"
-                    id="subject_2_12"
-                    autoComplete="off"
-                    value={studentData.subject_2_12}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_2_12}
+                  </div>
                 </div>
               </div>
               {/* Subject 3 and 4 */}
@@ -1140,15 +934,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 3"}
                   </label>
-                  <input
-                    type="number"
-                    name="subject_3_12"
-                    id="subject_3_12"
-                    autoComplete="off"
-                    value={studentData.subject_3_12}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_3_12}
+                  </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
                   <label
@@ -1157,15 +945,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 4"}
                   </label>
-                  <input
-                    type="number"
-                    name="subject_4_12"
-                    id="subject_4_12"
-                    autoComplete="off"
-                    value={studentData.subject_4_12}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_4_12}
+                  </div>
                 </div>
               </div>
               {/* Subject 5 and 6 */}
@@ -1177,15 +959,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 5"}
                   </label>
-                  <input
-                    type="number"
-                    name="subject_5_12"
-                    id="subject_5_12"
-                    autoComplete="off"
-                    value={studentData.subject_5_12}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_5_12}
+                  </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
                   <label
@@ -1194,14 +970,9 @@ export default function FacultyPortal() {
                   >
                     {"Subject 6"}
                   </label>
-                  <input
-                    type="number"
-                    name="subject_6_12"
-                    id="subject_6_12"
-                    autoComplete="off"
-                    value={studentData.subject_6_12}
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subject_6_12 || "......"}
+                  </div>
                 </div>
               </div>
               {/* Total marks and Percentage*/}
@@ -1213,15 +984,9 @@ export default function FacultyPortal() {
                   >
                     {"Total Marks *"}
                   </label>
-                  <input
-                    type="number"
-                    name="total_marks_12"
-                    id="total_marks_12"
-                    autoComplete="off"
-                    value={studentData.total_marks_12}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.total_marks_12}
+                  </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
                   <label
@@ -1230,30 +995,46 @@ export default function FacultyPortal() {
                   >
                     {"Percentage *"}
                   </label>
-                  <input
-                    type="number"
-                    name="total_percentage_12"
-                    id="total_percentage_12"
-                    autoComplete="off"
-                    value={studentData.total_percentage_12}
-                    required
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.total_percentage_12}
+                  </div>
                 </div>
               </div>
-              {/* {marksheet_error_12 && (
-                <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                  {marksheet_error_12}
-                </p>
-              )} */}
+              {/* PCM: Total marks and Percentage*/}
+              <div className="w-full flex flex-col justify-center gap-4 items-center">
+                <div className="w-[71%] flex justify-between items-center">
+                  <label
+                    htmlFor="pcm_marks"
+                    className="text-md w-2/3 font-semibold mr-10"
+                  >
+                    {"Total Marks in PCM *"}
+                  </label>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.pcm_marks}
+                  </div>
+                </div>
+                <div className="w-[71%] flex justify-between items-center">
+                  <label
+                    htmlFor="pcm_percentage"
+                    className="text-md w-2/3 font-semibold mr-10"
+                  >
+                    {"Percentage in PCM *"}
+                  </label>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.pcm_percentage}
+                  </div>
+                </div>
+              </div>
               {/* 12th Marksheet & Passing Certificate */}
-              <div className="w-full flex justify-center items-center">
-                <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+              <div className="w-[85%] flex justify-center items-center">
+                <div className="w-[85%] flex gap-12 items-center justify-between bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                   <label
                     htmlFor="12th_marksheet_upload"
-                    className="w-1/2 text-left text-md font-bold text-2xl"
+                    className="w-2/3 text-left text-md font-medium"
                   >
-                    {"12th Marksheet Link"}
+                    {
+                      "Attached 12th Marksheet & Passing Certificate Google Drive Link (Anyone with the link)."
+                    }{" "}
                   </label>
                   {studentData.marksheet_12 ? (
                     <div className="flex items-center gap-2 ">
@@ -1263,7 +1044,7 @@ export default function FacultyPortal() {
                           href={studentData.marksheet_12}
                           target="_blank"
                         >
-                          {"12th Marksheet"}
+                          {"Download 12th Marksheet"}
                         </Link>
                       </p>
                     </div>
@@ -1276,237 +1057,176 @@ export default function FacultyPortal() {
               </div>
             </div>
             {/* Diploma Students Lateral Entry B.tech */}
-            <div className="w-[90%] flex flex-col items-center gap-6 border-2 border-indigo-200 p-4 rounded-lg">
-              <div className="w-[90%] my-2 font-medium text-md bg-purple-100 border-2 border-red-600 rounded-md p-4 text-center">
-                {
-                  "* To be filled by Applicants of B.Tech. (Lateral Entry) Programme "
-                }
-              </div>
-              {/* University and rollno */}
-              <div className="w-full flex justify-center gap-12 items-center">
-                <div className="w-1/3 flex justify-between items-center">
+            {studentData.university !== "" && (
+              <div className="w-[90%] flex flex-col items-center gap-6 border-2 border-indigo-200 p-4 rounded-lg">
+                <div className="w-[90%] my-2 font-medium text-md bg-purple-100 border-2 border-red-600 rounded-md p-4 text-center">
+                  {
+                    "* To be filled by Applicants of B.Tech. (Lateral Entry) Programme "
+                  }
+                </div>
+                {/* University and rollno */}
+                <div className="w-full flex justify-center gap-12 items-center">
+                  <div className="w-1/3 flex justify-between items-center">
+                    <label
+                      htmlFor="university"
+                      className="text-md w-2/3 font-semibold"
+                    >
+                      {"University "}
+                    </label>
+                    <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                      {studentData.university}
+                    </div>
+                  </div>
+                  <div className="w-1/3 flex justify-between items-center">
+                    <label
+                      htmlFor="roll_no_university"
+                      className="text-md w-1/3 font-semibold"
+                    >
+                      {"Roll No. "}
+                    </label>
+                    <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                      {studentData.roll_no_university}
+                    </div>
+                  </div>
+                </div>
+                {/* 1st year */}
+                <h2 className="text-md font-medium my-2 underline underline-offset-2">
+                  {"1st Year"}
+                </h2>
+                <div className="w-[75%] flex justify-center gap-12 items-center">
                   <label
-                    htmlFor="university"
+                    htmlFor="subjects_1st_year"
                     className="text-md w-2/3 font-semibold"
                   >
-                    {"University "}
+                    {"Subjects Taken (seperated by commas)"}
                   </label>
-                  <input
-                    type="text"
-                    name="university"
-                    id="university"
-                    autoComplete="off"
-                    value={studentData.university}
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subjects_1st_year}
+                  </div>
                 </div>
-                <div className="w-1/3 flex justify-between items-center">
-                  <label
-                    htmlFor="roll_no_university"
-                    className="text-md w-1/3 font-semibold"
-                  >
-                    {"Roll No. "}
-                  </label>
-                  <input
-                    type="number"
-                    name="roll_no_university"
-                    id="roll_no_university"
-                    autoComplete="off"
-                    value={studentData.roll_no_university}
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  />
+                <div className="w-[75%] flex justify-center gap-6 items-center">
+                  {/* Total Marks, Marks Obtained and Percentage in 1st year */}
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.t_m_1}
+                  </div>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.m_o_1}
+                  </div>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.p_1}
+                  </div>
                 </div>
-              </div>
-              {/* 1st year */}
-              <h2 className="text-md font-medium my-2 underline underline-offset-2">
-                {"1st Year"}
-              </h2>
-              <div className="w-[75%] flex justify-center gap-12 items-center">
-                <label
-                  htmlFor="subjects_1st_year"
-                  className="text-md w-2/3 font-semibold"
-                >
-                  {"Subjects Taken (seperated by commas)"}
-                </label>
-                <input
-                  type="text"
-                  name="subjects_1st_year"
-                  id="subjects_1st_year"
-                  autoComplete="off"
-                  placeholder="eg. English, Mathematics,..."
-                  value={studentData.subjects_1st_year}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-              </div>
-              <div className="w-[75%] flex justify-center gap-6 items-center">
-                {/* Total Marks, Marks Obtained and Percentage in 1st year */}
-                <input
-                  type="number"
-                  name="t_m_1"
-                  id="t_m_1"
-                  autoComplete="off"
-                  placeholder="Total Marks"
-                  value={studentData.t_m_1}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="number"
-                  name="m_o_1"
-                  id="m_o_1"
-                  autoComplete="off"
-                  placeholder="Marks Obtained"
-                  value={studentData.m_o_1}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="number"
-                  name="p_1"
-                  id="p_1"
-                  autoComplete="off"
-                  placeholder="Percentage (%)"
-                  value={studentData.p_1}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-              </div>
-              {/* 2nd year */}
-              <h2 className="text-md font-medium my-2 underline underline-offset-2">
-                {"2nd Year"}
-              </h2>
-              <div className="w-[75%] flex justify-center gap-12 items-center">
-                <label
-                  htmlFor="subjects_2nd_year"
-                  className="text-md w-2/3 font-semibold"
-                >
-                  {"Subjects Taken (seperated by commas)"}
-                </label>
-                <input
-                  type="text"
-                  name="subjects_2nd_year"
-                  id="subjects_2nd_year"
-                  autoComplete="off"
-                  placeholder="eg. English, Mathematics,..."
-                  value={studentData.subjects_2nd_year}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-              </div>
-
-              <div className="w-[75%] flex justify-center gap-6 items-center">
-                {/* Total Marks, Marks Obtained and Percentage in 1st year */}
-                <input
-                  type="number"
-                  name="t_m_2"
-                  id="t_m_2"
-                  autoComplete="off"
-                  placeholder="Total Marks"
-                  value={studentData.t_m_2}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="number"
-                  name="m_o_2"
-                  id="m_o_2"
-                  autoComplete="off"
-                  placeholder="Marks Obtained"
-                  value={studentData.m_o_2}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="number"
-                  name="p_2"
-                  id="p_2"
-                  autoComplete="off"
-                  placeholder="Percentage (%)"
-                  value={studentData.p_2}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-              </div>
-              {/* 3rd year */}
-              <h2 className="text-md font-medium my-2 underline underline-offset-2">
-                {"3rd Year"}
-              </h2>
-              <div className="w-[75%] flex justify-center gap-12 items-center">
-                <label
-                  htmlFor="subjects_3rd_year"
-                  className="text-md w-2/3 font-semibold"
-                >
-                  {"Subjects Taken (seperated by commas)"}
-                </label>
-                <input
-                  type="text"
-                  name="subjects_3rd_year"
-                  id="subjects_3rd_year"
-                  autoComplete="off"
-                  placeholder="eg. English, Mathematics,..."
-                  value={studentData.subjects_3rd_year}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-              </div>
-
-              <div className="w-[75%] flex justify-center gap-6 items-center">
-                {/* Total Marks, Marks Obtained and Percentage in 3rd year */}
-                <input
-                  type="number"
-                  name="t_m_3"
-                  id="t_m_3"
-                  autoComplete="off"
-                  placeholder="Total Marks"
-                  value={studentData.t_m_3}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="number"
-                  name="m_o_3"
-                  id="m_o_3"
-                  autoComplete="off"
-                  placeholder="Marks Obtained"
-                  value={studentData.m_o_3}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-                <input
-                  type="number"
-                  name="p_3"
-                  id="p_3"
-                  autoComplete="off"
-                  placeholder="Percentage (%)"
-                  value={studentData.p_3}
-                  className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                />
-              </div>
-
-              {/* {diploma_certificate_error && (
-                <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                  {diploma_certificate_error}
-                </p>
-              )} */}
-              {/* Diploma Marksheet & Passing Certificate */}
-              <div className="w-full flex justify-center items-center">
-                <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+                {/* 2nd year */}
+                <h2 className="text-md font-medium my-2 underline underline-offset-2">
+                  {"2nd Year"}
+                </h2>
+                <div className="w-[75%] flex justify-center gap-12 items-center">
                   <label
-                    htmlFor="diploma_certificate_link"
-                    className="w-1/2 text-left text-md font-bold text-2xl"
+                    htmlFor="subjects_2nd_year"
+                    className="text-md w-2/3 font-semibold"
                   >
-                    {"Diploma Certificate Link"}
+                    {"Subjects Taken (seperated by commas)"}
                   </label>
-                  {studentData.diploma_certificate ? (
-                    <div className="flex items-center gap-2 ">
-                      <p className="w flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                        <Link
-                          className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
-                          href={studentData.diploma_certificate}
-                          target="_blank"
-                        >
-                          {"Diploma Certificate"}
-                        </Link>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subjects_2nd_year}
+                  </div>
+                </div>
+
+                <div className="w-[75%] flex justify-center gap-6 items-center">
+                  {/* Total Marks, Marks Obtained and Percentage in 1st year */}
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.t_m_2}
+                  </div>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.m_o_2}
+                  </div>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.p_2}
+                  </div>
+                </div>
+                {/* 3rd year */}
+                <h2 className="text-md font-medium my-2 underline underline-offset-2">
+                  {"3rd Year"}
+                </h2>
+                <div className="w-[75%] flex justify-center gap-12 items-center">
+                  <label
+                    htmlFor="subjects_3rd_year"
+                    className="text-md w-2/3 font-semibold"
+                  >
+                    {"Subjects Taken (seperated by commas)"}
+                  </label>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.subjects_3rd_year}
+                  </div>
+                </div>
+
+                <div className="w-[75%] flex justify-center gap-6 items-center">
+                  {/* Total Marks, Marks Obtained and Percentage in 3rd year */}
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.t_m_3}
+                  </div>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.m_o_3}
+                  </div>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.p_3}
+                  </div>
+                </div>
+
+                <h2 className="text-md font-medium my-2 underline underline-offset-2">
+                  {"Aggregate"}
+                </h2>
+                <div className="w-[75%] flex justify-center gap-6 items-center">
+                  {/* Total Marks, Marks Obtained and Percentage Aggregate */}
+                  <div
+                    value={formValues.t_m_total}
+                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
+                  >
+                    {formValues.t_m_total}
+                  </div>
+                  <div
+                    value={formValues.m_o_total}
+                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
+                  >
+                    {formValues.m_o_total}
+                  </div>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {formValues.p_total}
+                  </div>
+                </div>
+
+                {/* Diploma Marksheet & Passing Certificate */}
+                <div className="w-full flex justify-center items-center">
+                  <div className="w-[85%] flex gap-12 items-center justify-between bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+                    <label
+                      htmlFor="diploma_certificate_link"
+                      className="w-2/3 text-left text-md font-medium"
+                    >
+                      {
+                        "Attached Diploma Marksheet of all semester examinations & Passing Certificate(for Lateral Entry).*"
+                      }{" "}
+                    </label>
+                    {studentData.diploma_certificate ? (
+                      <div className="flex items-center gap-2 ">
+                        <p className="w flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                          <Link
+                            className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                            href={studentData.diploma_certificate}
+                            target="_blank"
+                          >
+                            {"Download Diploma Certificate"}
+                          </Link>
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                        {`Diploma Certificate missing`}
                       </p>
-                    </div>
-                  ) : (
-                    <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                      {`Diploma Certificate missing`}
-                    </p>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="w-[90%] border border-indigo-400 my-2 rounded-full border-dotted" />
@@ -1545,29 +1265,23 @@ export default function FacultyPortal() {
                   <span className="font-bold mr-2">{"Branch:"}</span>
                   {"C-4, Jankpuri, New Delhi-110058"}
                 </p>
-                {/* Payment Receipt Error */}
-                {/* {paymentReceiptError && (
-                  <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                    {paymentReceiptError}
-                  </p>
-                )} */}
                 <div className="w-full flex justify-center items-center">
                   <div className="w-[100%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                     <label
                       htmlFor="payment_script_proof_link"
-                      className="w-1/2 text-left text-md font-bold text-2xl"
+                      className="w-full text-left text-md font-medium"
                     >
-                      {"Payment Receipt Link (Proof)"}
+                      {"Payment Receipt (Proof) *"}
                     </label>
                     {studentData.paymentReceipt ? (
                       <div className="flex items-center gap-2 ">
-                        <p className="w flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                        <p className="w-[250px] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
                           <Link
                             className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
                             href={studentData.paymentReceipt}
                             target="_blank"
                           >
-                            {"Payment Receipt"}
+                            {"Download Payment Receipt"}
                           </Link>
                         </p>
                       </div>
@@ -1596,11 +1310,6 @@ export default function FacultyPortal() {
                     "I understand that by merely submitting application form under management quota does not entitle/guarantee me the admission in Maharaja Surajmal Institute of Technology and if admission is granted then I hereby solemnly affirm and declare that I fulfill the eligibility conditions prescribed by the GGSIPU University and my admission would be provisional and subject to final ratification by the GGSIPU on verification. I have also read the Admission Brochure of GGSIPU for 2024-2025 and understood allocation and reservation of seats and manner of admission."
                   }
                 </p>
-                {/* {signatureErrors.candidate && (
-                  <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                    {signatureErrors.candidate}
-                  </p>
-                )} */}
                 <div className="w-full justify-between flex items-center">
                   <div className="">
                     <label htmlFor="date">{"Date: "}</label>
@@ -1608,7 +1317,7 @@ export default function FacultyPortal() {
                       type="text"
                       name="date"
                       id="date"
-                      value={createdDate}
+                      value={studentData.createdAt}
                       readOnly
                       className="outline-none bg-inherit border-none"
                     />
@@ -1618,15 +1327,16 @@ export default function FacultyPortal() {
                       {"Signature of the Candidate: "}
                     </label>
                     {studentData.candidateSignature ? (
-                      <div className="relative">
-                        <a
-                          href={studentData.candidateSignature}
-                          download="CandidateSignature.png"
-                          className="w-40 h-10 border-black flex justify-center items-center text-center bg-blue-500 text-white font-medium rounded-lg"
-                          target="_blank"
-                        >
-                          {"Download Now"}
-                        </a>
+                      <div className="flex items-center gap-2 ">
+                        <p className="w-[250px] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                          <Link
+                            className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                            href={studentData.candidateSignature}
+                            target="_blank"
+                          >
+                            {"Download Candidate Signature"}
+                          </Link>
+                        </p>
                       </div>
                     ) : (
                       <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
@@ -1647,7 +1357,7 @@ export default function FacultyPortal() {
                       type="text"
                       name="date_2"
                       id="date_2"
-                      value={createdDate}
+                      value={studentData.createdAt}
                       readOnly
                       className="outline-none bg-inherit border-none"
                     />
@@ -1657,15 +1367,16 @@ export default function FacultyPortal() {
                       {"Signature of Father/Mother: "}
                     </label>
                     {studentData.parentSignature ? (
-                      <div className="relative">
-                        <a
-                          href={studentData.parentSignature}
-                          download="ParentSignature.png"
-                          className="w-40 h-10 border-black flex justify-center items-center text-center bg-blue-500 text-white font-medium rounded-lg"
-                          target="_blank"
-                        >
-                          {"Download Now"}
-                        </a>
+                      <div className="flex items-center gap-2 ">
+                        <p className="w-[250px] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                          <Link
+                            className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                            href={studentData.parentSignature}
+                            target="_blank"
+                          >
+                            {"Download Parent Signature"}
+                          </Link>
+                        </p>
                       </div>
                     ) : (
                       <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
@@ -1686,16 +1397,18 @@ export default function FacultyPortal() {
             </span>
           </div>
           {/* Passport size photograph upload */}
-          <div className="w-36 h-36 border border-indigo-900 flex justify-center items-center gap-2 absolute right-8 top-40 cursor-pointer bg-blue-500 rounded-lg">
+          <div className="w-36 h-36 border border-indigo-900 flex justify-center items-center gap-2 absolute right-8 top-40 cursor-pointer  rounded-lg">
             {studentData.passportPhoto ? (
-              <a
-                href={studentData.passportPhoto} // Changed 'src' to 'href' for link
-                download // Added 'download' attribute to trigger download
-                className="text-white font-medium"
+              <Link
+                href={studentData.passportPhoto}
+                download
+                className="w-2/3 text-center font-medium text-indigo-600 hover:text-indigo-700 active:text-indigo-600 hover:underline"
                 target="_blank"
               >
-                Download Now
-              </a>
+                {"Download"} <br />{" "}
+                {studentData.first_name + " " + studentData.surname} <br />
+                {"Photo"}
+              </Link>
             ) : (
               <p className="text-center font-medium text-red-600">
                 Student Passport Photo Missing

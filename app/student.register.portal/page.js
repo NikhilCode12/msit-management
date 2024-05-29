@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import axios from "axios";
+import HomeButton from "../components/HomeButton";
 // import mongoose from "mongoose";
 
 export default function StudentRegisterPortal() {
@@ -106,6 +107,7 @@ export default function StudentRegisterPortal() {
           candidateSignature,
           parentSignature,
           applicationNumber: appNo,
+          createdAt: currentDate,
           choices: {
             btechChecked,
             leToBtechChecked,
@@ -303,10 +305,19 @@ export default function StudentRegisterPortal() {
   useEffect(() => {
     const getCurrentDate = () => {
       const today = new Date();
+
       const dd = String(today.getDate()).padStart(2, "0");
       const mm = String(today.getMonth() + 1).padStart(2, "0");
       const yyyy = today.getFullYear();
-      return `${dd}/${mm}/${yyyy}`;
+
+      let hours = today.getHours();
+      const minutes = String(today.getMinutes()).padStart(2, "0");
+      const am_pm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const strTime = `${hours}:${minutes} ${am_pm}`;
+
+      return `${dd}/${mm}/${yyyy} ${strTime}`;
     };
 
     setCurrentDate(getCurrentDate());
@@ -394,6 +405,11 @@ export default function StudentRegisterPortal() {
     t_m_3: "",
     m_o_3: "",
     p_3: "",
+    t_m_total: "",
+    m_o_total: "",
+    p_total: "",
+    pcm_marks: "",
+    pcm_percentage: "",
   });
 
   useEffect(() => {
@@ -419,28 +435,9 @@ export default function StudentRegisterPortal() {
   const handleFileInputChange = (e) => {
     const { name, value } = e.target;
 
-    let percentage_diploma = 0;
-
     setFormValues((prevFormValues) => ({
       ...prevFormValues,
       [name]: value,
-    }));
-
-    if (name === "m_o_1" && formValues.t_m_1 !== 0) {
-      percentage_diploma =
-        (parseFloat(value) / parseFloat(formValues.t_m_1)) * 100;
-    } else if (name === "m_o_2" && formValues.t_m_2 !== 0) {
-      percentage_diploma =
-        (parseFloat(value) / parseFloat(formValues.t_m_2)) * 100;
-    } else if (name === "m_o_3" && formValues.t_m_3 !== 0) {
-      percentage_diploma =
-        (parseFloat(value) / parseFloat(formValues.t_m_3)) * 100;
-    }
-
-    setFormValues((prevFormValues) => ({
-      ...prevFormValues,
-      [name === "m_o_1" ? "p_1" : name === "m_o_2" ? "p_2" : "p_3"]:
-        percentage_diploma.toFixed(2),
     }));
   };
 
@@ -448,6 +445,13 @@ export default function StudentRegisterPortal() {
     <main className="flex flex-col justify-center items-center w-full my-12 gap-6 relative">
       {!isFormSubmitted ? (
         <>
+          {/* Home button */}
+          <Link
+            href="/"
+            className="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-600 absolute top-0 left-10 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center"
+          >
+            <HomeButton className="text-white" />
+          </Link>
           {/* Login Form Student */}
           <h2 className="text-3xl font-bold text-indigo-900">
             Management Quota Application Form{" (2024-2025)"}
@@ -716,7 +720,7 @@ export default function StudentRegisterPortal() {
               {/* Registration Date */}
               <div className="w-full flex justify-center items-center">
                 <label
-                  htmlFor="Registration_Date"
+                  htmlFor="registration_date"
                   className="text-md w-1/3 font-semibold"
                 >
                   {"Registration Date *"}
@@ -724,7 +728,7 @@ export default function StudentRegisterPortal() {
                 <input
                   type="date"
                   name="registration_date"
-                  id="Registration_Date"
+                  id="registration_date"
                   autoComplete="off"
                   value={regDate}
                   onChange={handleRegistrationDate}
@@ -1681,6 +1685,45 @@ export default function StudentRegisterPortal() {
                     />
                   </div>
                 </div>
+                {/* PCM: Total marks and Percentage*/}
+                <div className="w-full flex flex-col justify-center gap-4 items-center">
+                  <div className="w-2/3 flex justify-between items-center">
+                    <label
+                      htmlFor="pcm_marks"
+                      className="text-md w-2/3 font-semibold "
+                    >
+                      {"Total Marks in PCM *"}
+                    </label>
+                    <input
+                      type="number"
+                      name="pcm_marks"
+                      id="pcm_marks"
+                      autoComplete="off"
+                      value={formValues.pcm_marks}
+                      onChange={(e) => handleFileInputChange(e)}
+                      required
+                      className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
+                    />
+                  </div>
+                  <div className="w-2/3 flex justify-between items-center">
+                    <label
+                      htmlFor="pcm_percentage"
+                      className="text-md w-2/3 font-semibold mr-2"
+                    >
+                      {"Percentage in PCM *"}
+                    </label>
+                    <input
+                      type="number"
+                      name="pcm_percentage"
+                      id="pcm_percentage"
+                      autoComplete="off"
+                      value={formValues.pcm_percentage}
+                      onChange={(e) => handleFileInputChange(e)}
+                      required
+                      className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
+                    />
+                  </div>
+                </div>
                 {marksheet_error_12 && (
                   <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
                     {marksheet_error_12}
@@ -1921,6 +1964,44 @@ export default function StudentRegisterPortal() {
                   />
                 </div>
 
+                {/* Aggregate */}
+                <h2 className="text-md font-medium my-2 underline underline-offset-2">
+                  {"Aggregate"}
+                </h2>
+                <div className="w-[75%] flex justify-center gap-6 items-center">
+                  {/* Total Marks, Marks Obtained and Percentage Aggregate */}
+                  <input
+                    type="number"
+                    name="t_m_total"
+                    id="t_m_total"
+                    autoComplete="off"
+                    placeholder="Total Marks"
+                    value={formValues.t_m_total}
+                    onChange={handleFileInputChange}
+                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
+                  />
+                  <input
+                    type="number"
+                    name="m_o_total"
+                    id="m_o_total"
+                    autoComplete="off"
+                    placeholder="Marks Obtained"
+                    value={formValues.m_o_total}
+                    onChange={handleFileInputChange}
+                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
+                  />
+                  <input
+                    type="number"
+                    name="p_total"
+                    id="p_total"
+                    autoComplete="off"
+                    placeholder="Percentage (%)"
+                    value={formValues.p_total}
+                    onChange={handleFileInputChange}
+                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
+                  />
+                </div>
+
                 {diploma_certificate_error && (
                   <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
                     {diploma_certificate_error}
@@ -1948,6 +2029,7 @@ export default function StudentRegisterPortal() {
                       autoComplete="off"
                       placeholder="Enter Google Drive Link (Please select: Anyone with the link - Shareable)"
                       className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
+                      disabled={formValues.university !== "" ? false : true}
                     />
                   </div>
                 </div>

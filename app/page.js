@@ -5,8 +5,8 @@ export default function Home() {
   return (
     <main className="flex flex-col justify-center items-center w-full gap-6 h-full">
       {/* Login/Register Portals */}
-      <h1 className="text-3xl font-medium text-indigo-900 w-full text-center my-4">
-        Management Portal MSIT
+      <h1 className="text-3xl font-bold text-indigo-800 w-full text-center my-4">
+        Management Quota Admission Portal
       </h1>
       {/* Student Login/Register Portal */}
       <div className="flex justify-center items-center w-full gap-12">
