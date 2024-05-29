@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
 
@@ -9,7 +9,8 @@ export default function FacultyPortal() {
   const [isLoading, setIsLoading] = useState(false);
   const [notFoundError, setNotFoundError] = useState("");
   const [applicationNumberError, setApplicationNumberError] = useState("");
-
+  const [formattedRegDate, setFormattedRegDate] = useState("");
+  const [createdDate, setCreatedRegDate] = useState("");
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!applicationNumber) {
@@ -35,6 +36,16 @@ export default function FacultyPortal() {
       setStudentData(null);
     }
   };
+  useEffect(() => {
+    if (studentData && studentData.regDate && studentData.createdAt && studentData.passportPhoto) {
+      const regDate = new Date(studentData.regDate);
+      const createdDate = new Date(studentData.createdAt)
+      const formattedReg = regDate.toISOString().split('T')[0];
+      const formattedCreated = createdDate.toISOString().split('T')[0];
+      setFormattedRegDate(formattedReg);
+      setCreatedRegDate(formattedCreated);
+    }
+  }, [studentData]);
 
   return (
     <main
@@ -323,7 +334,7 @@ export default function FacultyPortal() {
               >
                 {"Programme Name *"}
               </label>
-              <select name="programme_name" id="programme_name">
+              <select name="programme_name" id="programme_name" className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md">
                 <option>{studentData.programmeName}</option>
               </select>
             </div>
@@ -384,7 +395,7 @@ export default function FacultyPortal() {
                 name="registration_date"
                 id="Registration_Date"
                 autoComplete="off"
-                value={studentData.regDate}
+                value={formattedRegDate}
                 className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
                 required
               />
@@ -434,17 +445,21 @@ export default function FacultyPortal() {
               <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                 <label
                   htmlFor="ggsipu_registration_form_upload"
-                  className="w-2/3 text-left text-md font-medium"
-                ></label>
+                  className="w-1/2 text-left text-md font-bold text-2xl"
+                >
+                  {"Registration Form Link"}
+                </label>
                 {studentData.registrationForm ? (
                   <div className="flex items-center gap-2 ">
-                    <Link
-                      className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
-                      href={studentData.registrationForm}
-                      target="_blank"
-                    >
-                      {"Registration Form"}
-                    </Link>
+                    <p className="w-[150px] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                      <Link
+                        className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                        href={studentData.registrationForm}
+                        target="_blank"
+                      >
+                        {"Registration Form"}
+                      </Link>
+                    </p>
                   </div>
                 ) : (
                   <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
@@ -463,18 +478,26 @@ export default function FacultyPortal() {
             <div className="w-full flex justify-center items-center">
               <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                 <label
-                  htmlFor="admit_card_upload"
-                  className="w-2/3 text-left text-md font-medium"
-                ></label>
+                  htmlFor="ggsipu_registration_form_upload"
+                  className="w-1/2 text-left text-md font-bold text-2xl"
+                >
+                  {"Admit Card Link"}
+                </label>
                 {studentData.admitCard ? (
                   <div className="flex items-center gap-2 ">
-                    <span className="bg-gray-100 rounded-md p-2">
-                      {studentData.admitCard.name}
-                    </span>
+                    <p className="w-[150px] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                      <Link
+                        className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                        href={studentData.admitCard}
+                        target="_blank"
+                      >
+                        {"Admit Card"}
+                      </Link>
+                    </p>
                   </div>
                 ) : (
                   <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                    {`Admit card Missing`}
+                    {`Admit Card missing`}
                   </p>
                 )}
               </div>
@@ -602,7 +625,7 @@ export default function FacultyPortal() {
               <label
                 htmlFor="legible_postal_address"
                 className="text-md w-1/3 font-semibold"
-              ></label>
+              >{"Legible Postal Address"}</label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
                 <input
                   type="text"
@@ -620,7 +643,7 @@ export default function FacultyPortal() {
               <label
                 htmlFor="legible_contact"
                 className="text-md w-1/3 font-semibold"
-              ></label>
+              >{"Legible Contact No."}</label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
                 <input
                   type="number"
@@ -638,7 +661,7 @@ export default function FacultyPortal() {
               <label
                 htmlFor="legible_email"
                 className="text-md w-1/3 font-semibold"
-              ></label>
+              >{"Legible Email I.D."}</label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
                 <input
                   type="email"
@@ -695,18 +718,26 @@ export default function FacultyPortal() {
             <div className="w-full flex justify-center items-center">
               <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                 <label
-                  htmlFor="category_certificate_upload"
-                  className="w-2/3 text-left text-md font-medium"
-                ></label>
-                {studentData.categoryCertificate ? (
+                  htmlFor="category_certificate_link"
+                  className="w-1/2 text-left text-md font-bold text-2xl"
+                >
+                  {"Category Certificate Link"}
+                </label>
+                {studentData.category_certificate ? (
                   <div className="flex items-center gap-2 ">
-                    <span className="bg-gray-100 rounded-md p-2">
-                      {studentData.categoryCertificate.name}
-                    </span>
+                    <p className="w flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                      <Link
+                        className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                        href={studentData.category_certificate}
+                        target="_blank"
+                      >
+                        {"Category Certificate"}
+                      </Link>
+                    </p>
                   </div>
                 ) : (
                   <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                    {`Category Certificate Missing`}
+                    {`Category Certificate missing`}
                   </p>
                 )}
               </div>
@@ -970,23 +1001,29 @@ export default function FacultyPortal() {
                 </p>
               )} */}
               {/* 10th Marksheet & Passing Certificate */}
-              <div className="w-full flex justify-center items-center mb-2">
-                <div className="w-[90%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+              <div className="w-full flex justify-center items-center">
+                <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                   <label
                     htmlFor="10th_marksheet_upload"
-                    className="w-2/3 text-left text-md font-medium"
+                    className="w-1/2 text-left text-md font-bold text-2xl"
                   >
-                    {"Please attach 10th Marksheet & Passing Certificate. *"}{" "}
+                    {"10th Marksheet Link"}
                   </label>
                   {studentData.marksheet_10 ? (
                     <div className="flex items-center gap-2 ">
-                      <span className="bg-gray-100 rounded-md p-2">
-                        {studentData.marksheet_10.name}
-                      </span>
+                      <p className="w flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                        <Link
+                          className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                          href={studentData.marksheet_10}
+                          target="_blank"
+                        >
+                          {"10th Marksheet"}
+                        </Link>
+                      </p>
                     </div>
                   ) : (
                     <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                      {"Missing 10th Marksheet"}
+                      {`10th Marksheet missing`}
                     </p>
                   )}
                 </div>
@@ -1210,21 +1247,29 @@ export default function FacultyPortal() {
                 </p>
               )} */}
               {/* 12th Marksheet & Passing Certificate */}
-              <div className="w-full flex justify-center items-center mb-2">
-                <div className="w-[90%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+              <div className="w-full flex justify-center items-center">
+                <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                   <label
                     htmlFor="12th_marksheet_upload"
-                    className="w-2/3 text-left text-md font-medium"
-                  ></label>
+                    className="w-1/2 text-left text-md font-bold text-2xl"
+                  >
+                    {"12th Marksheet Link"}
+                  </label>
                   {studentData.marksheet_12 ? (
                     <div className="flex items-center gap-2 ">
-                      <span className="bg-gray-100 rounded-md p-2">
-                        {studentData.marksheet_12.name}
-                      </span>
+                      <p className="w flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                        <Link
+                          className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                          href={studentData.marksheet_12}
+                          target="_blank"
+                        >
+                          {"12th Marksheet"}
+                        </Link>
+                      </p>
                     </div>
                   ) : (
                     <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                      {"Missing 12th Marksheet"}
+                      {`12th Marksheet missing`}
                     </p>
                   )}
                 </div>
@@ -1434,21 +1479,29 @@ export default function FacultyPortal() {
                 </p>
               )} */}
               {/* Diploma Marksheet & Passing Certificate */}
-              <div className="w-full flex justify-center items-center mb-2">
-                <div className="w-[90%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+              <div className="w-full flex justify-center items-center">
+                <div className="w-[85%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                   <label
-                    htmlFor="diploma_certificate"
-                    className="w-2/3 text-left text-md font-medium"
-                  ></label>
+                    htmlFor="diploma_certificate_link"
+                    className="w-1/2 text-left text-md font-bold text-2xl"
+                  >
+                    {"Diploma Certificate Link"}
+                  </label>
                   {studentData.diploma_certificate ? (
                     <div className="flex items-center gap-2 ">
-                      <span className="bg-gray-100 rounded-md p-2">
-                        {studentData.diploma_certificate.name}
-                      </span>
+                      <p className="w flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                        <Link
+                          className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                          href={studentData.diploma_certificate}
+                          target="_blank"
+                        >
+                          {"Diploma Certificate"}
+                        </Link>
+                      </p>
                     </div>
                   ) : (
                     <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                      {"Diploma Certificate Missing"}
+                      {`Diploma Certificate missing`}
                     </p>
                   )}
                 </div>
@@ -1498,23 +1551,29 @@ export default function FacultyPortal() {
                     {paymentReceiptError}
                   </p>
                 )} */}
-                <div className="w-full flex justify-center items-center mt-2">
-                  <div className="w-full flex gap-12 items-center justify-between bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
+                <div className="w-full flex justify-center items-center">
+                  <div className="w-[100%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
                     <label
-                      htmlFor="payment_receipt_upload"
-                      className="w-[70%] text-left text-md font-medium"
+                      htmlFor="payment_script_proof_link"
+                      className="w-1/2 text-left text-md font-bold text-2xl"
                     >
-                      {"Payment Receipt(Proof). *"}{" "}
+                      {"Payment Receipt Link (Proof)"}
                     </label>
                     {studentData.paymentReceipt ? (
                       <div className="flex items-center gap-2 ">
-                        <span className="bg-gray-100 rounded-md p-2">
-                          {studentData.paymentReceipt.name}
-                        </span>
+                        <p className="w flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
+                          <Link
+                            className="text-indigo-500 rounded-md p-2 hover:text-indigo-700 hover:underline"
+                            href={studentData.paymentReceipt}
+                            target="_blank"
+                          >
+                            {"Payment Receipt"}
+                          </Link>
+                        </p>
                       </div>
                     ) : (
                       <p className="w-[85%] flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                        {"Payment Receipt Missing"}
+                        {`Payment Receipt missing`}
                       </p>
                     )}
                   </div>
@@ -1549,7 +1608,7 @@ export default function FacultyPortal() {
                       type="text"
                       name="date"
                       id="date"
-                      value={"currentDate"}
+                      value={createdDate}
                       readOnly
                       className="outline-none bg-inherit border-none"
                     />
@@ -1560,19 +1619,14 @@ export default function FacultyPortal() {
                     </label>
                     {studentData.candidateSignature ? (
                       <div className="relative">
-                        <img
-                          src={studentData.candidateSignature}
-                          alt="Candidate Signature"
-                          className="w-40 h-10 border border-black"
-                        />
-                        {/* {showCandidateCross && (
-                          <button
-                            onClick={() => handleRemoveImage("candidate")}
-                            className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                          >
-                            &#x2715;
-                          </button>
-                        )} */}
+                        <a
+                          href={studentData.candidateSignature}
+                          download="CandidateSignature.png"
+                          className="w-40 h-10 border-black flex justify-center items-center text-center bg-blue-500 text-white font-medium rounded-lg"
+                          target="_blank"
+                        >
+                          {"Download Now"}
+                        </a>
                       </div>
                     ) : (
                       <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
@@ -1586,12 +1640,6 @@ export default function FacultyPortal() {
                     "I have carefully read and verified the information furnished by my son/daughter/ward and affirm that it is true and correct and he/she fulfills the eligibility conditions as mentioned in the Admission Bulletin/Rules of GGSIPU."
                   }
                 </p>
-
-                {/* {signatureErrors.parent && (
-                  <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                    {signatureErrors.parent}
-                  </p>
-                )} */}
                 <div className="w-full justify-between flex items-center">
                   <div className="">
                     <label htmlFor="date_2">{"Date: "}</label>
@@ -1599,7 +1647,7 @@ export default function FacultyPortal() {
                       type="text"
                       name="date_2"
                       id="date_2"
-                      value={"currentDate"}
+                      value={createdDate}
                       readOnly
                       className="outline-none bg-inherit border-none"
                     />
@@ -1610,19 +1658,14 @@ export default function FacultyPortal() {
                     </label>
                     {studentData.parentSignature ? (
                       <div className="relative">
-                        <img
-                          src={studentData.parentSignature}
-                          alt="Parent Signature"
-                          className="w-40 h-10 border-black"
-                        />
-                        {/* {showParentCross && (
-                          <button
-                            onClick={() => handleRemoveImage("parent")}
-                            className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                          >
-                            &#x2715;
-                          </button>
-                        )} */}
+                        <a
+                          href={studentData.parentSignature}
+                          download="ParentSignature.png"
+                          className="w-40 h-10 border-black flex justify-center items-center text-center bg-blue-500 text-white font-medium rounded-lg"
+                          target="_blank"
+                        >
+                          {"Download Now"}
+                        </a>
                       </div>
                     ) : (
                       <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
@@ -1643,14 +1686,19 @@ export default function FacultyPortal() {
             </span>
           </div>
           {/* Passport size photograph upload */}
-          <div className="w-36 h-48 border outline-double border-indigo-900 flex flex-col justify-between items-center gap-4 absolute right-8 top-40 cursor-pointer">
+          <div className="w-36 h-36 border border-indigo-900 flex justify-center items-center gap-2 absolute right-8 top-40 cursor-pointer bg-blue-500 rounded-lg">
             {studentData.passportPhoto ? (
-              <div className="relative w-auto h-full">
-                {studentData.passportPhoto}
-              </div>
+              <a
+                href={studentData.passportPhoto} // Changed 'src' to 'href' for link
+                download // Added 'download' attribute to trigger download
+                className="text-white font-medium"
+                target="_blank"
+              >
+                Download Now
+              </a>
             ) : (
-              <p className="w-full flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-                {"Student Passport Photo Missing"}
+              <p className="text-center font-medium text-red-600">
+                Student Passport Photo Missing
               </p>
             )}
           </div>
