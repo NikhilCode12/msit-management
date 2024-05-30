@@ -456,7 +456,7 @@ export default function StudentRegisterPortal() {
     const capture = document.querySelector(".register-form");
     setIsDownloadLoading(true);
 
-    await html2canvas(capture, { scale: 2 }).then((canvas) => {
+    html2canvas(capture, { scale: 2 }).then((canvas) => {
       const imgData = canvas.toDataURL("image/jpeg", 0.5);
       const pdf = new jsPDF("p", "mm", "a4");
 
@@ -2363,12 +2363,14 @@ export default function StudentRegisterPortal() {
                 <button
                   type="submit"
                   className={` text-white py-2 px-6 rounded-lg font-medium text-md bg-indigo-900 hover:bg-indigo-700 active:bg-indigo-900 " ${
-                    !pdfDownloaded
-                      ? "opacity-50 cursor-not-allowed"
-                      : "cursor-pointer"
+                    isLoading ? "opacity-50" : "cursor-pointer"
+                  } ${
+                    pdfDownloaded
+                      ? "cursor-pointer"
+                      : "opacity-50 cursor-not-allowed"
                   }
               }`}
-                  disabled={pdfDownloaded}
+                  disabled={!pdfDownloaded}
                 >
                   {isLoading ? (
                     <div className="flex items-center">
