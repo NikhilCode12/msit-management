@@ -1,7 +1,17 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import HomeButton from "../components/HomeButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEye,
+  faEyeSlash,
+  faArrowLeft,
+  faLockOpen,
+  faLock,
+} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import StudentListModal from "../components/StudentListModal";
 
 export default function FacultyPortal() {
   const [applicationNumber, setApplicationNumber] = useState("");
@@ -9,6 +19,17 @@ export default function FacultyPortal() {
   const [isLoading, setIsLoading] = useState(false);
   const [notFoundError, setNotFoundError] = useState("");
   const [applicationNumberError, setApplicationNumberError] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showLoginBox, setShowLoginBox] = useState(true);
+  const [showAccessList, setShowAccessList] = useState(false);
+  const [showSearchBox, setShowSearchBox] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [loginFailure, setLoginFailure] = useState(false);
+  const [studentsListData, setStudentsListData] = useState(null);
+  const usernameInputRef = useRef();
+  const applicationNumberInputRef = useRef();
 
   const formattedDate = (dateString) => {
     const [year, month, day] = dateString.split("-");
@@ -24,22 +45,84 @@ export default function FacultyPortal() {
     try {
       setIsLoading(true);
       const response = await axios.get(`/api/student/${applicationNumber}`);
-      console.log(response.data.message);
       if (response.data.message === "Student not found!") {
         setIsLoading(false);
-        setNotFoundError(
-          "No such student found, try again with different application number!"
-        );
-        setStudentData(null);
+        setNotFoundError("Student record not found!");
+        setTimeout(() => {
+          setNotFoundError("");
+        }, 1000);
+        setApplicationNumber("");
         return;
+      } else {
+        setNotFoundError("");
+        setShowSearchBox(false);
       }
       setStudentData(response.data);
       setIsLoading(false);
+      setApplicationNumber("");
     } catch (error) {
       console.error("Error searching for student:", error.message);
       setStudentData(null);
     }
   };
+
+  const handleAccessList = async (e) => {
+    e.preventDefault();
+    setShowAccessList(true);
+    try {
+      const response = await axios.get("/api/student/all");
+      // console.log(response.data);
+      setStudentsListData(response.data);
+    } catch (err) {
+      console.log("Error in fetching student data", err);
+    }
+  };
+
+  const handleSelectStudent = (appNo) => {
+    setShowAccessList(false);
+    setApplicationNumber(appNo);
+  };
+
+  const handleClose = () => {
+    setShowAccessList(false);
+  };
+
+  const handleFacultyLogin = async (e) => {
+    e.preventDefault();
+    const correct_username = "mgmt_admsn_2024-25@msit.in";
+    const correct_password = "admission1234";
+    try {
+      if (username === correct_username && password === correct_password) {
+        setLoginSuccess(true);
+        setTimeout(() => {
+          setLoginSuccess(false);
+        }, 1000);
+        setShowLoginBox(false);
+        setShowSearchBox(true);
+      } else {
+        setLoginFailure(true);
+        usernameInputRef.current.focus();
+        setTimeout(() => {
+          setLoginFailure(false);
+        }, 1000);
+        setUsername("");
+        setPassword("");
+      }
+    } catch (error) {
+      console.error("Error validating for faculty:", error.message);
+      setStudentData(null);
+    }
+  };
+
+  const capitalize = (str) =>
+    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+  const upper = (str) => str.toUpperCase();
+
+  useEffect(() => {
+    if (showLoginBox) usernameInputRef.current.focus();
+    else if (showSearchBox) applicationNumberInputRef.current.focus();
+  }, [showLoginBox, showSearchBox]);
 
   return (
     <main
@@ -47,79 +130,220 @@ export default function FacultyPortal() {
         studentData ? "mt-20" : "h-full"
       }`}
     >
-      <h1 className="text-3xl font-bold text-indigo-950 my-2">
-        {"Student Search"}
-      </h1>
-      <div className="flex  items-center gap-4 border-2 border-indigo-900 rounded-md p-12">
-        <label htmlFor="applicationNumber" className="text-lg font-semibold">
-          Student Application Number
-        </label>
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            name="applicationNumber"
-            id="applicationNumber"
-            value={applicationNumber}
-            autoComplete="off"
-            onChange={(e) => setApplicationNumber(e.target.value)}
-            className={`border rounded-md px-3 py-2 outline-none ${
-              applicationNumberError ? "border-red-400" : "border-gray-400"
-            }`}
-            placeholder={applicationNumberError}
-            required
-          />
-          <button
-            type="submit"
-            onClick={handleSearch}
-            disabled={isLoading}
-            className={`text-white py-2 px-6 rounded-lg font-medium text-md bg-indigo-900 hover:bg-indigo-700 active:bg-indigo-900 ${
-              isLoading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            {isLoading ? (
-              <div className="flex items-center">
-                Searching
-                <svg
-                  className="animate-spin ml-2 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8z"
-                  ></path>
-                </svg>
-              </div>
-            ) : (
-              "Search"
-            )}
-          </button>
-        </div>
-      </div>
-
-      {notFoundError && studentData && (
-        <p className="w-2/3 flex justify-center items-center text-center border border-black font-medium text-red-600 bg-white py-1 rounded-lg">
-          {notFoundError}
-        </p>
+      {/* Home button */}
+      <Link
+        href="/"
+        className={`bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-600 absolute ${
+          studentData ? "-top-12" : "top-8"
+        } left-8 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center`}
+      >
+        <HomeButton className="text-white" />
+      </Link>
+      {showSearchBox && (
+        <h1 className="text-3xl font-bold text-indigo-950 my-2">
+          {"Student Search Portal"}
+        </h1>
       )}
 
+      {showLoginBox && (
+        <h1 className="text-3xl font-bold text-indigo-950 my-2">
+          {"Faculty Login Portal"}
+        </h1>
+      )}
+
+      {/* Login Box */}
+      {showLoginBox && (
+        <form
+          onSubmit={(e) => handleFacultyLogin(e)}
+          method={"POST"}
+          className="flex flex-col items-center gap-6 border-2 border-indigo-900 rounded-md px-20 py-8"
+        >
+          {/* Username */}
+          <div className="flex items-center gap-4">
+            <label htmlFor="username" className="text-lg font-semibold">
+              {"Username: "}
+            </label>
+            <input
+              ref={usernameInputRef}
+              type="text"
+              name="username"
+              id="username"
+              value={username}
+              autoComplete="off"
+              onChange={(e) => setUsername(e.target.value)}
+              className={`rounded-md px-3 py-2 outline-none  mr-2 w-[80%] ${
+                loginFailure
+                  ? "border-2 border-red-400 "
+                  : "focus:ring-2 focus:ring-blue-400 border border-gray-400"
+              }`}
+              placeholder={loginFailure ? "Login Failed" : "Enter username"}
+              required
+            />
+          </div>
+          {/* Password */}
+          <div className="flex items-center gap-4 w-[92.5%]">
+            <label htmlFor="password" className="text-lg font-semibold">
+              {"Password: "}
+            </label>
+            <div
+              className={`rounded-md px-3 py-2 outline-none flex justify-between items-center ${
+                loginFailure
+                  ? "border-2 border-red-400"
+                  : "active:ring-2 active:ring-blue-400 border border-gray-400"
+              }`}
+            >
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                id="password"
+                value={password}
+                autoComplete="off"
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-white outline-none w-2/3"
+                placeholder={loginFailure ? "Login Failed" : "Enter password"}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="ml-2 text-sm"
+              >
+                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+              </button>
+            </div>
+          </div>
+          {/* Login Button */}
+          <button
+            type="submit"
+            className={`text-white py-2 px-6 rounded-lg font-medium text-md bg-indigo-900 hover:bg-indigo-700 mt-2 active:bg-indigo-900`}
+          >
+            {"Login"}
+          </button>
+        </form>
+      )}
+
+      {/* Login Success Alert */}
+      {loginSuccess && (
+        <div className="text-white font-medium text-md bg-green-600 rounded-md w-[250px] text-center py-2 absolute bottom-8 right-8">
+          {"Logged in successfully."}
+        </div>
+      )}
+
+      {/* Login Failure Alert */}
+      {loginFailure && (
+        <div className="text-white font-medium text-md bg-red-600 rounded-md w-[250px] text-center py-2 absolute bottom-8 right-8">
+          {"Invalid credentials, Login failed!"}
+        </div>
+      )}
+
+      {/* Search box */}
+      {showSearchBox && (
+        <div className="flex  items-center gap-4 border-2 border-indigo-900 rounded-md p-12">
+          <label htmlFor="applicationNumber" className="text-lg font-semibold">
+            Student Application Number:
+          </label>
+          <form
+            className="flex items-center gap-2"
+            method="POST"
+            onSubmit={handleSearch}
+          >
+            <input
+              ref={applicationNumberInputRef}
+              type="text"
+              name="applicationNumber"
+              id="applicationNumber"
+              value={applicationNumber}
+              autoComplete="off"
+              onChange={(e) => setApplicationNumber(e.target.value)}
+              className={`border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-400 mr-2 ${
+                applicationNumberError
+                  ? "ring-2 ring-red-400"
+                  : "border-gray-400"
+              }`}
+              placeholder={
+                applicationNumberError
+                  ? applicationNumberError
+                  : "Application Number"
+              }
+              required
+            />
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`text-white py-2 px-6 rounded-lg font-medium text-md bg-indigo-900 hover:bg-indigo-700 active:bg-indigo-900 ${
+                isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {isLoading ? (
+                <div className="flex items-center">
+                  Searching
+                  <svg
+                    className="animate-spin ml-2 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8z"
+                    ></path>
+                  </svg>
+                </div>
+              ) : (
+                "Search"
+              )}
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Alert for no student found */}
+      {notFoundError && (
+        <div className="text-white font-medium text-md bg-red-600 rounded-md w-[250px] text-center py-2 absolute bottom-8 right-8">
+          {notFoundError}
+        </div>
+      )}
+
+      {/* Student Data after search */}
       {studentData && (
         <>
+          {/* Application Number and Candidate Name */}
+          <div className="flex border-2 border-black rounded-md px-4 py-2 w-auto">
+            <div className="flex justify-center items-center gap-4 w-full">
+              {/* Application Number */}
+              <div className="flex items-center justify-start gap-2 text-md font-medium ">
+                <h2 className="text-gray-600">{"Application Number: "}</h2>
+                <p className="font-bold">{studentData.appNo}</p>
+              </div>
+              <p>{"|"}</p>
+              {/* Candidate Name */}
+              <div className="flex items-center justify-start gap-2 text-md font-medium">
+                <h2 className="text-gray-600">{"Name: "}</h2>
+                <p className="font-bold">
+                  {capitalize(studentData.first_name) +
+                    " " +
+                    capitalize(studentData.middle_name) +
+                    " " +
+                    capitalize(studentData.surname)}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Login Form Student */}
           <h2 className="text-3xl font-bold text-indigo-900">
             Management Quota Application Form{" (2024-2025)"}
           </h2>
-          <div className="flex items-center justify-center text-center w-2/3 underline underline-offset-2 bg-purple-200 px-6 py-4 font-medium text-md border-2 border-indigo-900 rounded-lg mt-10">
+          <div className="flex items-center justify-center text-center w-2/3 underline underline-offset-2 bg-purple-200 px-6 py-4 font-medium text-md border-2 border-indigo-900 rounded-lg mt-4">
             {
               "Application Form for Admission under Management Quota Seats of GGSIPU, Delhi in"
             }{" "}
@@ -511,11 +735,11 @@ export default function FacultyPortal() {
                   id="first_name"
                   className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md"
                 >
-                  {studentData.first_name +
+                  {capitalize(studentData.first_name) +
                     "" +
-                    studentData.middle_name +
+                    capitalize(studentData.middle_name) +
                     " " +
-                    studentData.surname}
+                    capitalize(studentData.surname)}
                 </div>
               </div>
             </div>
@@ -529,11 +753,11 @@ export default function FacultyPortal() {
               </label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
                 <div className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md">
-                  {studentData.father_first_name +
+                  {capitalize(studentData.father_first_name) +
                     "" +
-                    studentData.father_middle_name +
+                    capitalize(studentData.father_middle_name) +
                     " " +
-                    studentData.father_surname}
+                    capitalize(studentData.father_surname)}
                 </div>
               </div>
             </div>
@@ -547,11 +771,11 @@ export default function FacultyPortal() {
               </label>
               <div className="w-1/2 flex gap-6 items-center justify-center">
                 <div className="py-1 px-3 w-full border-2 rounded-md border-gray-400 outline-none text-md">
-                  {studentData.mother_first_name +
+                  {capitalize(studentData.mother_first_name) +
                     "" +
-                    studentData.mother_middle_name +
+                    capitalize(studentData.mother_middle_name) +
                     " " +
-                    studentData.mother_surname}
+                    capitalize(studentData.mother_surname)}
                 </div>
               </div>
             </div>
@@ -688,7 +912,7 @@ export default function FacultyPortal() {
                     {"Board *"}
                   </label>
                   <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
-                    {studentData.board}
+                    {upper(studentData.board)}
                   </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
@@ -870,7 +1094,7 @@ export default function FacultyPortal() {
                     {"Board *"}
                   </label>
                   <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
-                    {studentData.board_12}
+                    {upper(studentData.board_12)}
                   </div>
                 </div>
                 <div className="w-1/3 flex justify-between items-center">
@@ -1074,7 +1298,7 @@ export default function FacultyPortal() {
                       {"University "}
                     </label>
                     <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
-                      {studentData.university}
+                      {capitalize(studentData.university)}
                     </div>
                   </div>
                   <div className="w-1/3 flex justify-between items-center">
@@ -1263,7 +1487,7 @@ export default function FacultyPortal() {
                 </p>
                 <p className="text-md font-medium">
                   <span className="font-bold mr-2">{"Branch:"}</span>
-                  {"C-4, Jankpuri, New Delhi-110058"}
+                  {"C-4, Janakpuri, New Delhi-110058"}
                 </p>
                 <div className="w-full flex justify-center items-center">
                   <div className="w-[100%] flex gap-12 items-center justify-center bg-purple-200 border-2 border-indigo-800 rounded-sm px-4 py-4">
@@ -1406,7 +1630,10 @@ export default function FacultyPortal() {
                 target="_blank"
               >
                 {"Download"} <br />{" "}
-                {studentData.first_name + " " + studentData.surname} <br />
+                {capitalize(studentData.first_name) +
+                  " " +
+                  capitalize(studentData.surname)}{" "}
+                <br />
                 {"Photo"}
               </Link>
             ) : (
@@ -1416,6 +1643,61 @@ export default function FacultyPortal() {
             )}
           </div>
         </>
+      )}
+
+      {/* Go back button */}
+      {studentData && (
+        <button
+          className={`bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-600 absolute flex gap-2 ${
+            studentData ? "-top-12" : "top-8"
+          } right-8 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center`}
+          onClick={() => {
+            setStudentData(null);
+            setShowSearchBox(true);
+          }}
+        >
+          <FontAwesomeIcon icon={faArrowLeft} />
+          {"Go Back"}
+        </button>
+      )}
+
+      {/* Access Student List Button after authorization */}
+      {showSearchBox && (
+        <button
+          className={`bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-600 absolute flex gap-2 ${
+            studentData ? "-top-12" : "top-8"
+          } right-8 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center`}
+          onClick={(e) => {
+            handleAccessList(e);
+          }}
+        >
+          <FontAwesomeIcon icon={faLockOpen} />
+          {"Access Student List"}
+        </button>
+      )}
+
+      {/* Access List Modal */}
+      {showAccessList && (
+        <StudentListModal
+          data={studentsListData}
+          onSelect={handleSelectStudent}
+          onClose={handleClose}
+        />
+      )}
+
+      {/* Access Student list Button before authorization */}
+      {showLoginBox && (
+        <button
+          className={`bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-600 absolute flex gap-2 ${
+            studentData ? "-top-12" : "top-8"
+          } right-8 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center`}
+          onClick={() => {
+            usernameInputRef.current.focus();
+          }}
+        >
+          <FontAwesomeIcon icon={faLock} />
+          {"Access Student List"}
+        </button>
       )}
     </main>
   );

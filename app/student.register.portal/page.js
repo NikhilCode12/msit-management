@@ -2072,7 +2072,7 @@ export default function StudentRegisterPortal() {
                   </p>
                   <p className="text-md font-medium">
                     <span className="font-bold mr-2">{"Branch:"}</span>
-                    {"C-4, Jankpuri, New Delhi-110058"}
+                    {"C-4, Janakpuri, New Delhi-110058"}
                   </p>
                   {/* Payment Receipt Error */}
                   {paymentReceiptError && (

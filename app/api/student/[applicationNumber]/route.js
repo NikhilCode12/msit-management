@@ -2,7 +2,7 @@ import Student from "@/lib/model/student";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
-async function ConnectToDatabase() {
+export async function ConnectToDatabase() {
   try {
     const conn = mongoose.connect(process.env.MONGO_URL);
     console.log("Connected to Database!");
