@@ -44,10 +44,19 @@ const Navbar = () => {
             <li>
               <a
                 className="hover:text-green-900 active:text-green-950"
-                href="#"
+                href="https://forms.gle/2cQAsK4NeRaGxHo78"
                 target="_blank"
               >
                 {"Feedback form for bugs and issues regarding this portal"}
+              </a>
+            </li>
+            <li>
+              <a
+                className="hover:text-green-900 active:text-green-950"
+                href="https://github.com/NikhilCode12"
+                target="_blank"
+              >
+                {"Support my other projects on Github."}
               </a>
             </li>
           </ul>
