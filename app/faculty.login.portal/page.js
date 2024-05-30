@@ -10,9 +10,12 @@ import {
   faLockOpen,
   faLock,
   faPrint,
+  faFilePdf,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import StudentListModal from "../components/StudentListModal";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 export default function FacultyPortal() {
   const [applicationNumber, setApplicationNumber] = useState("");
@@ -29,6 +32,7 @@ export default function FacultyPortal() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [loginFailure, setLoginFailure] = useState(false);
   const [studentsListData, setStudentsListData] = useState([]);
+  const [isDownloadLoading, setIsDownloadLoading] = useState(false);
   const usernameInputRef = useRef();
   const applicationNumberInputRef = useRef();
 
@@ -118,6 +122,38 @@ export default function FacultyPortal() {
       console.error("Error validating for faculty:", error.message);
       setStudentData(null);
     }
+  };
+
+  const handleDownloadPDF = (e) => {
+    const capture = document.querySelector(".register-form");
+    setIsDownloadLoading(true);
+
+    html2canvas(capture, { scale: 4 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/jpeg", 0.5);
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+
+      const pdfWidth = 210;
+      const pdfHeight = 297;
+      const scale = pdfWidth / (canvasWidth * 0.264583);
+      const pdfCanvasHeight = canvasHeight * 0.264583 * scale;
+
+      let position = 0;
+      while (position < pdfCanvasHeight) {
+        pdf.addImage(imgData, "JPEG", 0, -position, pdfWidth, pdfCanvasHeight);
+        if (position + pdfHeight < pdfCanvasHeight) {
+          pdf.addPage();
+        }
+        position += pdfHeight;
+      }
+
+      setIsDownloadLoading(false);
+
+      const filename = `${studentData.appNo}_${studentData.first_name}_form.pdf`;
+      pdf.save(filename);
+    });
   };
 
   const capitalize = (str) =>
@@ -321,9 +357,9 @@ export default function FacultyPortal() {
 
       {/* Student Data after search */}
       {studentData && (
-        <>
+        <div className="flex flex-col justify-center items-center w-full gap-10 relative register-form">
           {/* Application Number and Candidate Name */}
-          <div className="flex border-2 border-black rounded-md px-4 py-2 w-auto">
+          <div className="flex border-2 border-black rounded-md px-4 py-2 w-auto mt-4">
             <div className="flex justify-center items-center gap-4 w-full">
               {/* Application Number */}
               <div className="flex items-center justify-start gap-2 text-md font-medium ">
@@ -361,7 +397,7 @@ export default function FacultyPortal() {
             {"for the Academic Session 2024-25"}
           </div>
           {/* Programme Applied under 10% Management Quota */}
-          <div className="w-2/3 flex flex-col items-start gap-4 text-md font-medium text-center mb-4 bg-purple-100 border-2 border-red-600 rounded-md px-6 py-4 pb-6 my-4">
+          <div className="w-2/3 flex flex-col items-start gap-4 text-md font-medium text-center mb-4 bg-purple-100 border-2 border-red-600 rounded-md px-6 py-4 pb-6 my-2">
             <p className="font-medium text-center w-full">
               {"Programme applied under 10% Management Quota"}
             </p>
@@ -1648,7 +1684,7 @@ export default function FacultyPortal() {
               </p>
             )}
           </div>
-        </>
+        </div>
       )}
 
       {/* Go back button */}
@@ -1656,7 +1692,7 @@ export default function FacultyPortal() {
         <button
           className={`bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-600 absolute flex gap-2 ${
             studentData ? "-top-12" : "top-8"
-          } right-36 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center`}
+          } right-44 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center`}
           onClick={() => {
             setStudentData(null);
             setShowSearchBox(true);
@@ -1706,18 +1742,50 @@ export default function FacultyPortal() {
         </button>
       )}
 
+      {/* Download PDF Button */}
       {studentData && (
         <button
+          type="submit"
           className={`bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-600 absolute flex gap-2 ${
             studentData ? "-top-12" : "top-8"
-          }
-          } right-8 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center`}
-          onClick={() => {
-            window.print();
-          }}
+          } right-8 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center
+            ${
+              isDownloadLoading
+                ? "opacity-50 cursor-not-allowed"
+                : "cursor-pointer"
+            }`}
+          onClick={(e) => handleDownloadPDF(e)}
         >
-          <FontAwesomeIcon icon={faPrint} />
-          {"Print"}
+          {isDownloadLoading ? (
+            <div className="flex items-center">
+              {"Loading..."}
+              <svg
+                className="animate-spin ml-2 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8z"
+                ></path>
+              </svg>
+            </div>
+          ) : (
+            <div className="flex gap-2 items-center justify-center">
+              {"Download"}
+              <FontAwesomeIcon icon={faFilePdf} />
+            </div>
+          )}
         </button>
       )}
     </main>
