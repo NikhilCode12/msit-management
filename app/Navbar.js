@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <div className="flex flex-col py-8 w-full">
+    <div className="flex flex-col py-8 w-full no-print">
       {/* Logo */}
       <Link className="flex items-center justify-center" href={"/"}>
         <Image
@@ -37,17 +37,19 @@ const Navbar = () => {
                 target="_blank"
               >
                 {
-                  "Follow us @msitnewdelhi on Facebook, LinkedIn and Twitter for updates"
+                  "Follow us @msitnewdelhi on Facebook, LinkedIn and Twitter for updates."
                 }
               </a>
             </li>
             <li>
               <a
                 className="hover:text-green-900 active:text-green-950"
-                href="https://forms.gle/2cQAsK4NeRaGxHo78"
+                href="https://forms.gle/P4ptdMMX8re4BQ1r6"
                 target="_blank"
               >
-                {"Feedback form for bugs and issues regarding this portal"}
+                {
+                  "Feedback form for Bugs, Issues and Feedbacks regarding the Portal."
+                }
               </a>
             </li>
             <li>
@@ -56,7 +58,10 @@ const Navbar = () => {
                 href="https://github.com/NikhilCode12"
                 target="_blank"
               >
-                {"Support my other projects on Github."}
+                <span className="font-semibold"> {"Important Notice: "}</span>{" "}
+                {
+                  "Students registering on the portal must first upload their documents to Google Drive. Please ensure that the sharing settings are set to 'Anyone with the link' before adding the link to the registration form. Failure to do so may result in the cancellation of your registration."
+                }
               </a>
             </li>
           </ul>

@@ -3,6 +3,8 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import axios from "axios";
 import HomeButton from "../components/HomeButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 // import mongoose from "mongoose";
 
 export default function StudentRegisterPortal() {
@@ -442,7 +444,7 @@ export default function StudentRegisterPortal() {
   };
 
   return (
-    <main className="flex flex-col justify-center items-center w-full my-12 gap-6 relative">
+    <main className="flex flex-col justify-center items-center w-full my-8 gap-6 relative">
       {!isFormSubmitted ? (
         <>
           {/* Home button */}
@@ -452,11 +454,25 @@ export default function StudentRegisterPortal() {
           >
             <HomeButton className="text-white" />
           </Link>
+          {/* Notice */}
+          <div className="w-full flex flex-col justify-center items-center">
+            <div className="w-2/3 text-lg italic font-medium text-left mb-4 bg-white border-4 border-red-600 rounded-md mt-12 p-4">
+              <FontAwesomeIcon
+                icon={faExclamationTriangle}
+                size={"lg"}
+                className="mr-2 text-red-600 drop-shadow"
+              />
+              <span className="font-bold text-lg">{"Important Notice:"}</span>{" "}
+              {
+                "Students registering on the portal must first upload their documents to Google Drive. Please ensure that the sharing settings are set to 'Anyone with the link' before adding the link to the registration form. Failure to do so may result in the cancellation of your registration."
+              }
+            </div>
+          </div>
           {/* Login Form Student */}
-          <h2 className="text-3xl font-bold text-indigo-900">
+          <h2 className="text-3xl font-bold text-indigo-900 mt-4">
             Management Quota Application Form{" (2024-2025)"}
           </h2>
-          <div className="flex items-center justify-center text-center w-2/3 underline underline-offset-2 bg-purple-200 px-6 py-4 font-medium text-md border-2 border-indigo-900 rounded-lg mt-20">
+          <div className="flex items-center justify-center text-center w-2/3 underline underline-offset-2 bg-purple-200 px-6 py-4 font-medium text-md border-2 border-indigo-900 rounded-lg mt-8">
             {
               "Application Form for Admission under Management Quota Seats of GGSIPU, Delhi in"
             }{" "}
@@ -2262,7 +2278,7 @@ export default function StudentRegisterPortal() {
               </span>
             </div>
             {/* Passport size photograph upload */}
-            <div className="w-36 h-48 border outline-double border-indigo-900 flex flex-col justify-between items-center gap-4 absolute right-8 top-16 cursor-pointer">
+            <div className="w-36 h-48 border outline-double border-indigo-900 flex flex-col justify-between items-center gap-4 absolute right-8 top-60 cursor-pointer">
               <input
                 type="text"
                 name="photo_upload"

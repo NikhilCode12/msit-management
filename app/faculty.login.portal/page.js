@@ -9,6 +9,7 @@ import {
   faArrowLeft,
   faLockOpen,
   faLock,
+  faPrint,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import StudentListModal from "../components/StudentListModal";
@@ -1626,7 +1627,7 @@ export default function FacultyPortal() {
             </span>
           </div>
           {/* Passport size photograph upload */}
-          <div className="w-36 h-36 border border-indigo-900 flex justify-center items-center gap-2 absolute right-8 top-40 cursor-pointer  rounded-lg">
+          <div className="w-36 h-36 border border-indigo-900 flex justify-center items-center gap-2 absolute right-8 top-40 cursor-pointer  rounded-lg no-print">
             {studentData.passportPhoto ? (
               <Link
                 href={studentData.passportPhoto}
@@ -1655,7 +1656,7 @@ export default function FacultyPortal() {
         <button
           className={`bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-600 absolute flex gap-2 ${
             studentData ? "-top-12" : "top-8"
-          } right-8 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center`}
+          } right-36 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center`}
           onClick={() => {
             setStudentData(null);
             setShowSearchBox(true);
@@ -1702,6 +1703,21 @@ export default function FacultyPortal() {
         >
           <FontAwesomeIcon icon={faLock} />
           {"Access Student List"}
+        </button>
+      )}
+
+      {studentData && (
+        <button
+          className={`bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-600 absolute flex gap-2 ${
+            studentData ? "-top-12" : "top-8"
+          }
+          } right-8 text-white px-4 py-2 font-semibold rounded-md flex items-center justify-center`}
+          onClick={() => {
+            window.print();
+          }}
+        >
+          <FontAwesomeIcon icon={faPrint} />
+          {"Print"}
         </button>
       )}
     </main>
