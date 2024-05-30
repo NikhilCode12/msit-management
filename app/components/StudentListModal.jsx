@@ -3,14 +3,24 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 
-const StudentListModal = ({ data, onSelect, onClose }) => {
+const StudentListModal = ({ fetchStudentData, onSelect, onClose }) => {
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (data !== null) {
+    const fetchData = async () => {
+      setLoading(true);
+      const newData = await fetchStudentData();
+      setData(newData);
       setLoading(false);
-    }
-  }, [data]);
+    };
+
+    fetchData();
+
+    const intervalId = setInterval(fetchData, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [fetchStudentData]);
 
   const handleSelect = (applicationNumber) => {
     onSelect(applicationNumber);
@@ -40,7 +50,11 @@ const StudentListModal = ({ data, onSelect, onClose }) => {
           </div>
           {loading ? (
             <div className="flex items-center justify-center h-full">
-              <div className="loader ease-linear rounded-full border-8 border-t-8 border-indigo-400 h-32 w-32" />
+              <div className="dot-loader">
+                <div className="dot"></div>
+                <div className="dot"></div>
+                <div className="dot"></div>
+              </div>
             </div>
           ) : data && data.length > 0 ? (
             <table className="min-w-full bg-white border border-gray-300">

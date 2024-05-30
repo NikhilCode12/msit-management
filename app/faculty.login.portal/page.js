@@ -27,7 +27,7 @@ export default function FacultyPortal() {
   const [showSearchBox, setShowSearchBox] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [loginFailure, setLoginFailure] = useState(false);
-  const [studentsListData, setStudentsListData] = useState(null);
+  const [studentsListData, setStudentsListData] = useState([]);
   const usernameInputRef = useRef();
   const applicationNumberInputRef = useRef();
 
@@ -66,16 +66,21 @@ export default function FacultyPortal() {
     }
   };
 
+  const fetchStudentData = async () => {
+    try {
+      const response = await fetch("/api/student/all");
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching student data:", error);
+      return [];
+    }
+  };
+
   const handleAccessList = async (e) => {
     e.preventDefault();
+    await fetchStudentData();
     setShowAccessList(true);
-    try {
-      const response = await axios.get("/api/student/all");
-      // console.log(response.data);
-      setStudentsListData(response.data);
-    } catch (err) {
-      console.log("Error in fetching student data", err);
-    }
   };
 
   const handleSelectStudent = (appNo) => {
@@ -631,7 +636,7 @@ export default function FacultyPortal() {
                 id="jee_cet_rollno"
                 className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
               >
-                {studentData.rollNo}
+                {studentData.rollNo || "......"}
               </div>
             </div>
             {/* Rank CET/JEE LE */}
@@ -647,7 +652,7 @@ export default function FacultyPortal() {
                 id="jee_cet_rank"
                 className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
               >
-                {studentData.rank}
+                {studentData.rank || "......"}
               </div>
             </div>
             {/* Registration form missing error */}
@@ -1679,7 +1684,7 @@ export default function FacultyPortal() {
       {/* Access List Modal */}
       {showAccessList && (
         <StudentListModal
-          data={studentsListData}
+          fetchStudentData={fetchStudentData}
           onSelect={handleSelectStudent}
           onClose={handleClose}
         />
