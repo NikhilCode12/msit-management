@@ -5,9 +5,9 @@ import Navbar from "./Navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Management Portal",
+  title: "Management Quota Admission Portal - MSIT",
   description:
-    "Maharaja Surajmal Institute of Technology Management Portal created with Next.js",
+    "Maharaja Surajmal Institute of Technology Management Quota Admission Portal created with Next.js",
 };
 
 export default function RootLayout({ children }) {

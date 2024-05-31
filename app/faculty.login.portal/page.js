@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import HomeButton from "../components/HomeButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -71,16 +71,20 @@ export default function FacultyPortal() {
     }
   };
 
-  const fetchStudentData = async () => {
+  const fetchStudentData = useCallback(async () => {
     try {
-      const response = await fetch("/api/student/all");
+      const response = await fetch("/api/student/all", {
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
       const data = await response.json();
       return data;
     } catch (error) {
       console.error("Error fetching student data:", error);
       return [];
     }
-  };
+  }, []);
 
   const handleAccessList = async (e) => {
     e.preventDefault();
@@ -100,7 +104,7 @@ export default function FacultyPortal() {
   const handleFacultyLogin = async (e) => {
     e.preventDefault();
     const correct_username = "mgmt_admsn_2024-25@msit.in";
-    const correct_password = "admission1234";
+    const correct_password = "admission_msit@1234";
     try {
       if (username === correct_username && password === correct_password) {
         setLoginSuccess(true);
@@ -1444,20 +1448,14 @@ export default function FacultyPortal() {
                 </h2>
                 <div className="w-[75%] flex justify-center gap-6 items-center">
                   {/* Total Marks, Marks Obtained and Percentage Aggregate */}
-                  <div
-                    value={formValues.t_m_total}
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  >
-                    {formValues.t_m_total}
-                  </div>
-                  <div
-                    value={formValues.m_o_total}
-                    className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md"
-                  >
-                    {formValues.m_o_total}
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.t_m_total}
                   </div>
                   <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
-                    {formValues.p_total}
+                    {studentData.m_o_total}
+                  </div>
+                  <div className="py-1 px-3 w-2/3 border-2 rounded-md border-gray-400 outline-none text-md">
+                    {studentData.p_total}
                   </div>
                 </div>
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 
@@ -7,20 +7,22 @@ const StudentListModal = ({ fetchStudentData, onSelect, onClose }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
       const newData = await fetchStudentData();
       setData(newData);
-      setLoading(false);
-    };
-
-    fetchData();
-
-    const intervalId = setInterval(fetchData, 5000);
-
-    return () => clearInterval(intervalId);
+    } catch (err) {
+      console.error("Error fetching student data:", err);
+    }
+    setLoading(false);
   }, [fetchStudentData]);
+
+  useEffect(() => {
+    fetchData();
+    const intervalId = setInterval(fetchData, 10000);
+    return () => clearInterval(intervalId);
+  }, [fetchData]);
 
   const handleSelect = (applicationNumber) => {
     onSelect(applicationNumber);
