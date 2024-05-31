@@ -11,17 +11,22 @@ const StudentListModal = ({ fetchStudentData, onSelect, onClose }) => {
     setLoading(true);
     try {
       const newData = await fetchStudentData();
-      setData((prevData) => {
-        const existingAppNumbers = prevData.map(
-          (student) => student.applicationNumber
-        );
-        const newEntries = newData.filter(
-          (student) => !existingAppNumbers.includes(student.applicationNumber)
-        );
-        return [...prevData, ...newEntries];
-      });
+      if (newData.length === 0) {
+        setData([]);
+      } else {
+        setData((prevData) => {
+          const existingAppNumbers = prevData.map(
+            (student) => student.applicationNumber
+          );
+          const newEntries = newData.filter(
+            (student) => !existingAppNumbers.includes(student.applicationNumber)
+          );
+          return [...prevData, ...newEntries];
+        });
+      }
     } catch (err) {
       console.error("Error fetching student data:", err);
+      setData([]);
     }
     setLoading(false);
   }, [fetchStudentData]);
