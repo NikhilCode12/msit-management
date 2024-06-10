@@ -5,7 +5,7 @@ import Student from "@/lib/model/student";
 export async function GET() {
   try {
     await ConnectToDatabase();
-    const students = await Student.find();
+    const students = await Student.find().toList();
     if (!students || students.length === 0) {
       return NextResponse.json({ message: "No Record Found" });
     }
