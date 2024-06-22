@@ -7,6 +7,7 @@ export async function GET() {
     await ConnectToDatabase();
     // console.log(Student.lenght)
     const students = await Student.find();
+    print('****************')
     console.log(students.length)
     if (!students || students.length === 0) {
       return NextResponse.json({ message: "No Record Found" });
