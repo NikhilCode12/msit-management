@@ -5,9 +5,9 @@ import Student from "@/lib/model/student";
 export async function GET() {
   try {
     await ConnectToDatabase();
-    // console.log(Student.count())
+    console.log(Student.lenght)
     const students = await Student.find();
-    // console.log(Student.count())
+    console.log(Student.length)
     if (!students || students.length === 0) {
       return NextResponse.json({ message: "No Record Found" });
     }
