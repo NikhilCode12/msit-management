@@ -71,7 +71,7 @@ export default function FacultyPortal() {
     }
   };
 
-  const fetchStudentData = useCallback(async () => {
+  const fetchStudentData = useEffect(async () => {
     try {
       const response = await fetch("/api/student/all", {
         headers: {
