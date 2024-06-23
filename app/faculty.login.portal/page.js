@@ -33,7 +33,8 @@ export default function FacultyPortal() {
   const [loginFailure, setLoginFailure] = useState(false);
   const [studentsListData, setStudentsListData] = useState([]);
   const [isDownloadLoading, setIsDownloadLoading] = useState(false);
- // const[data,setData]=useState([]);
+  const [studentData, setStudentData] = useState([]);
+
   const usernameInputRef = useRef();
   const applicationNumberInputRef = useRef();
 
@@ -72,33 +73,54 @@ export default function FacultyPortal() {
     }
   };
 
+  // const fetchStudentData = useCallback(async () => {
+  //   try {
+  //     // const response = await fetch("/api/student/all", {
+  //     //   headers: {
+  //     //   "Cache-Control": "no-cache",
+  //     //   "Pragma": "no-cache",
+  //     //   "Expires": "0",
+  //     // },
+  //     // });
+  //     const response = await axios.get("/api/student/all", {
+  //     headers: {
+  //       "Cache-Control": "no-cache",
+  //       "Pragma": "no-cache",
+  //       "Expires": "0",
+  //     },
+  //   });
+  //     //console.log('response rec')
+  //     const data = await response.json();
+  //     //setData(tdata);
+  //       //console.log(response)
+  //     console.log(data)
+  //     return data;
+  //   } catch (error) {
+  //     console.error("Error fetching student data:", error);
+  //     return [];
+  //   }
+  // }, []);
   const fetchStudentData = useCallback(async () => {
-    try {
-      // const response = await fetch("/api/student/all", {
-      //   headers: {
-      //   "Cache-Control": "no-cache",
-      //   "Pragma": "no-cache",
-      //   "Expires": "0",
-      // },
-      // });
-      const response = await axios.get("/api/student/all", {
+  try {
+    const response = await axios.get("/api/student/all", {
       headers: {
         "Cache-Control": "no-cache",
         "Pragma": "no-cache",
         "Expires": "0",
       },
     });
-      //console.log('response rec')
-      const data = await response.json();
-      //setData(tdata);
-        //console.log(response)
-      console.log(data)
-      return data;
-    } catch (error) {
-      console.error("Error fetching student data:", error);
-      return [];
-    }
-  }, []);
+    const data = response.data; // axios automatically parses the response as JSON
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching student data:", error);
+    return [];
+  }
+}, []);
+  useEffect(() => {
+  fetchStudentData().then(data => setStudentData(data));
+}, [fetchStudentData]);
+
 
   const handleAccessList = async (e) => {
     e.preventDefault();
