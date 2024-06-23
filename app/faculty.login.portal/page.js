@@ -74,7 +74,7 @@ export default function FacultyPortal() {
 
   const fetchStudentData = useCallback(async () => {
     try {
-      const response = await fetch("/api/student/all", {
+      const response = await fetch("/api/student/all/route.js", {
         headers: {
           "Cache-Control": "no-cache",
         },
@@ -89,7 +89,7 @@ export default function FacultyPortal() {
       console.error("Error fetching student data:", error);
       return [];
     }
-  }, [fetchStudentData]);
+  }, []);
 
   const handleAccessList = async (e) => {
     e.preventDefault();
