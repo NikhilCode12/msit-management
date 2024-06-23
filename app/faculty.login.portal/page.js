@@ -33,6 +33,7 @@ export default function FacultyPortal() {
   const [loginFailure, setLoginFailure] = useState(false);
   const [studentsListData, setStudentsListData] = useState([]);
   const [isDownloadLoading, setIsDownloadLoading] = useState(false);
+  const[data,setData]=useState([]);
   const usernameInputRef = useRef();
   const applicationNumberInputRef = useRef();
 
@@ -79,7 +80,8 @@ export default function FacultyPortal() {
         },
       });
       console.log('response rec')
-      const data = await response.json();
+      const tdata = await response.json();
+      setData(tdata);
       console.log(response)
       console.log(data)
       return data;
