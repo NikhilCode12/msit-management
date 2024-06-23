@@ -2,16 +2,33 @@ import Student from "@/lib/model/student";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
+// export async function ConnectToDatabase() {
+//   try {
+//     const conn = mongoose.connect(process.env.MONGO_URL);
+//     console.log("Connected to Database!");
+//   } catch (err) {
+//     console.error("Database connection error:", err);
+//     throw new Error("Failed to connect to the database");
+//   }
+// }
 export async function ConnectToDatabase() {
   try {
-    const conn = mongoose.connect(process.env.MONGO_URL);
+    // Check if already connected
+    if (mongoose.connection.readyState === 1) {
+      console.log("Already connected to Database!");
+      return;
+    }
+
+    await mongoose.connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log("Connected to Database!");
   } catch (err) {
     console.error("Database connection error:", err);
     throw new Error("Failed to connect to the database");
   }
 }
-
 export async function GET(request, { params }) {
   const { applicationNumber: id } = params;
   if (!id) {
