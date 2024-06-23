@@ -100,7 +100,7 @@ export default function FacultyPortal() {
   //     return [];
   //   }
   // }, []);
-  const fetchStudentData = useCallback(async () => {
+  const fetchStudentData = useCallback(async () => { 
   try {
     const response = await axios.get("/api/student/all", {
       headers: {
