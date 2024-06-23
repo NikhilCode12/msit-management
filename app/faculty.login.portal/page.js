@@ -81,15 +81,15 @@ export default function FacultyPortal() {
       });
       console.log('response rec')
       const tdata = await response.json();
-      setData(tdata);
-      console.log(response)
-      console.log(data)
-      return data;
+      //setData(tdata);
+     // console.log(response)
+      //console.log(data)
+      return tdata;
     } catch (error) {
       console.error("Error fetching student data:", error);
       return [];
     }
-  }, [data]);
+  }, []);
 
   const handleAccessList = async (e) => {
     e.preventDefault();
