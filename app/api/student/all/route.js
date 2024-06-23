@@ -8,6 +8,7 @@ export async function GET() {
     // console.log(Student.lenght)
     console.log('Inside find function')
     const students = await Student.find();
+    console.log(students);
     if (!students || students.length === 0) {
       return NextResponse.json({ message: "No Record Found" });
     }
