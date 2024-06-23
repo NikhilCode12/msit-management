@@ -89,7 +89,7 @@ export default function FacultyPortal() {
       console.error("Error fetching student data:", error);
       return [];
     }
-  }, []);
+  }, [data]);
 
   const handleAccessList = async (e) => {
     e.preventDefault();
