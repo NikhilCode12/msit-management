@@ -33,7 +33,7 @@ export default function FacultyPortal() {
   const [loginFailure, setLoginFailure] = useState(false);
   const [studentsListData, setStudentsListData] = useState([]);
   const [isDownloadLoading, setIsDownloadLoading] = useState(false);
-  const[data,setData]=useState([]);
+ // const[data,setData]=useState([]);
   const usernameInputRef = useRef();
   const applicationNumberInputRef = useRef();
 
@@ -79,12 +79,12 @@ export default function FacultyPortal() {
           "Cache-Control": "no-cache",
         },
       });
-      console.log('response rec')
-      const tdata = await response.json();
+      //console.log('response rec')
+      const data = await response.json();
       //setData(tdata);
      // console.log(response)
       //console.log(data)
-      return tdata;
+      return data;
     } catch (error) {
       console.error("Error fetching student data:", error);
       return [];
