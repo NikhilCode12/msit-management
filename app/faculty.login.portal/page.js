@@ -34,7 +34,7 @@ export default function FacultyPortal() {
   const [loginFailure, setLoginFailure] = useState(false);
   const [studentsListData, setStudentsListData] = useState([]);
   const [isDownloadLoading, setIsDownloadLoading] = useState(false);
-  const [studentData, setStudentData] = useState([]);
+  const [data,setData]=useState([]);
 
   const usernameInputRef = useRef();
   const applicationNumberInputRef = useRef();
@@ -119,7 +119,7 @@ export default function FacultyPortal() {
   }
 }, []);
   useEffect(() => {
-  fetchStudentData().then(data => setStudentData(data));
+  fetchStudentData().then(data => setData(data));
 }, [fetchStudentData]);
 
 
