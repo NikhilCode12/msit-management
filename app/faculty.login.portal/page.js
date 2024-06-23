@@ -109,9 +109,9 @@ export default function FacultyPortal() {
         "Expires": "0",
       },
     });
-    const data = response.data; // axios automatically parses the response as JSON
-    console.log(data);
-    return data;
+    const tdata = response.data; // axios automatically parses the response as JSON
+    console.log(tdata);
+    return tdata;
   } catch (error) {
     console.error("Error fetching student data:", error);
     return [];
