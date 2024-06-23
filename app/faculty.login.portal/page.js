@@ -82,7 +82,7 @@ export default function FacultyPortal() {
       //console.log('response rec')
       const data = await response.json();
       //setData(tdata);
-     // console.log(response)
+        console.log(response)
       //console.log(data)
       return data;
     } catch (error) {
