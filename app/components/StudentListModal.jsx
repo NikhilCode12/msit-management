@@ -12,13 +12,16 @@ const StudentListModal = ({ onSelect, onClose }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/students", {
-        headers: {
-          "Cache-Control": "no-cache",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      });
+      const response = await fetch(
+        "https://backend-management-0xpn.onrender.com/student/all",
+        {
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }
+      );
       const result = await response.json();
       console.log("API Response:", result);
       if (response.ok) {
