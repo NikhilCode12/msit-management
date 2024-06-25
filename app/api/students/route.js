@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ConnectToDatabase } from "../[applicationNumber]/route";
+import { ConnectToDatabase } from "../student/[applicationNumber]/route";
 import Student from "@/lib/model/student";
 
 export async function GET() {
