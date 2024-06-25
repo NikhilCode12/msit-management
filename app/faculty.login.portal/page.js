@@ -33,7 +33,7 @@ export default function FacultyPortal() {
   const [loginFailure, setLoginFailure] = useState(false);
   const [studentsListData, setStudentsListData] = useState([]);
   const [isDownloadLoading, setIsDownloadLoading] = useState(false);
- 
+
   const usernameInputRef = useRef();
   const applicationNumberInputRef = useRef();
 
@@ -72,33 +72,31 @@ export default function FacultyPortal() {
     }
   };
 
-  const fetchStudentData = useCallback(async () => {
-    try {
-      const response = await fetch("/api/student/all", {
-        headers: {
-        "Cache-Control": "no-cache",
-        "Pragma": "no-cache",
-        "Expires": "0",
-      },
-      });
-     
-      //console.log('response rec')
-      const data = await response.json();
-      //setData(tdata);
-        //console.log(response)
-      console.log(data)
-      return data;
-    } catch (error) {
-      console.error("Error fetching student data:", error);
-      return [];
-    }
-  }, []);
- 
+  // const fetchStudentData = useCallback(async () => {
+  //   try {
+  //     const response = await fetch("/api/student/all", {
+  //       headers: {
+  //         "Cache-Control": "no-cache",
+  //         Pragma: "no-cache",
+  //         Expires: "0",
+  //       },
+  //     });
 
+  //     //console.log('response rec')
+  //     const data = await response.json();
+  //     //setData(tdata);
+  //     //console.log(response)
+  //     // console.log(data)
+  //     return data;
+  //   } catch (error) {
+  //     console.error("Error fetching student data:", error);
+  //     return [];
+  //   }
+  // }, []);
 
   const handleAccessList = async (e) => {
     e.preventDefault();
-    await fetchStudentData();
+    // await fetchStudentData();
     setShowAccessList(true);
   };
 
@@ -1729,7 +1727,7 @@ export default function FacultyPortal() {
       {/* Access List Modal */}
       {showAccessList && (
         <StudentListModal
-          fetchStudentData={fetchStudentData}
+          // fetchStudentData={fetchStudentData}
           onSelect={handleSelectStudent}
           onClose={handleClose}
         />

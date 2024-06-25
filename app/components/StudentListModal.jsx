@@ -1,41 +1,43 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faRefresh, faTimes } from "@fortawesome/free-solid-svg-icons";
 
-const StudentListModal = ({ fetchStudentData, onSelect, onClose }) => {
+const StudentListModal = ({ onSelect, onClose }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const newData = await fetchStudentData();
-      if (newData.length === 0) {
-        setData([]);
+      const response = await fetch("/api/student/all", {
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      });
+      const result = await response.json();
+      console.log("API Response:", result);
+      if (response.ok) {
+        setData(result);
       } else {
-        setData((prevData) => {
-          const existingAppNumbers = prevData.map(
-            (student) => student.applicationNumber
-          );
-          const newEntries = newData.filter(
-            (student) => !existingAppNumbers.includes(student.applicationNumber)
-          );
-          return [...prevData, ...newEntries];
-        });
+        setError(result.message || "Failed to fetch student data");
+        setData([]);
       }
     } catch (err) {
       console.error("Error fetching student data:", err);
+      setError("Internal Server Error");
       setData([]);
     }
     setLoading(false);
-  }, [fetchStudentData]);
+  };
 
   useEffect(() => {
     fetchData();
-    const intervalId = setInterval(fetchData, 10000);
-    return () => clearInterval(intervalId);
-  }, [fetchData]);
+  }, []);
 
   const handleSelect = (applicationNumber) => {
     onSelect(applicationNumber);
@@ -57,10 +59,17 @@ const StudentListModal = ({ fetchStudentData, onSelect, onClose }) => {
               Registered Students List
             </h2>
             <button
+              className="bg-gray-600 hover:bg-gray-700 active:bg-gray-600 text-white px-4 py-2 font-semibold rounded-md absolute top-5 right-16 text-xs"
+              onClick={fetchData}
+            >
+              Refresh
+              <FontAwesomeIcon icon={faRefresh} className="ml-2" />
+            </button>
+            <button
               onClick={handleClose}
               className="text-gray-500 hover:text-gray-800 focus:outline-none absolute top-6 right-6"
             >
-              <FontAwesomeIcon icon={faTimes} size={"xl"} />
+              <FontAwesomeIcon icon={faTimes} size="xl" />
             </button>
           </div>
           {loading ? (
@@ -71,18 +80,24 @@ const StudentListModal = ({ fetchStudentData, onSelect, onClose }) => {
                 <div className="dot"></div>
               </div>
             </div>
+          ) : error ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-lg font-semibold text-red-600 bg-slate-200 p-2">
+                {error}
+              </p>
+            </div>
           ) : data && data.length > 0 ? (
             <table className="min-w-full bg-white border border-gray-300">
               <thead>
                 <tr>
                   <th className="px-6 py-3 border-b border-gray-300 bg-gray-100 text-left text-sm leading-4 font-medium text-gray-900 uppercase tracking-wider">
-                    {"Application Number"}
+                    Application Number
                   </th>
                   <th className="px-6 py-3 border-b border-gray-300 bg-gray-100 text-left text-sm leading-4 font-medium text-gray-900 uppercase tracking-wider">
-                    {"Candidate Full Name"}
+                    Candidate Full Name
                   </th>
                   <th className="px-6 py-3 border-b border-gray-300 bg-gray-100 text-left text-sm leading-4 font-medium text-gray-900 uppercase tracking-wider">
-                    {"Option"}
+                    Option
                   </th>
                 </tr>
               </thead>
