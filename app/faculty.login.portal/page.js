@@ -50,7 +50,9 @@ export default function FacultyPortal() {
     }
     try {
       setIsLoading(true);
-      const response = await axios.get(`/api/student/${applicationNumber}`);
+      const response = await axios.get(
+        `https://backend-management-0xpn.onrender.com/student/?applicationNumber=${applicationNumber}`
+      );
       if (response.data.message === "Student not found!") {
         setIsLoading(false);
         setNotFoundError("Student record not found!");

@@ -122,7 +122,10 @@ export default function StudentRegisterPortal() {
           passportPhoto,
         };
 
-        const request = await axios.post("/api/submit-form", formData);
+        const request = await axios.post(
+          "https://backend-management-0xpn.onrender.com/submit-form",
+          formData
+        );
 
         if (request.status === 200) {
           setLoading(false);
