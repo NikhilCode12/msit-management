@@ -12,7 +12,7 @@ const StudentListModal = ({ onSelect, onClose }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/student/all", {
+      const response = await fetch("/api/students", {
         headers: {
           "Cache-Control": "no-cache",
           Pragma: "no-cache",
