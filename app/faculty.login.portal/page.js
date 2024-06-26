@@ -417,7 +417,7 @@ export default function FacultyPortal() {
             </p>
             <div className="w-full flex flex-col items-start">
               <h2 className="underline underline-offset-4">
-                {"B.Tech. (First Year)"}
+                {"B.Tech. (First Year) Prog. Code: 131"}
               </h2>
               <div className="grid grid-cols-4 gap-4 mt-4 text-md">
                 <div className="flex justify-between items-center gap-4">
@@ -494,7 +494,7 @@ export default function FacultyPortal() {
             </div>
             <div className="w-full flex flex-col items-start">
               <h2 className="underline underline-offset-4">
-                {"LE to B.Tech. (Second Year)"}
+                {"LE to B.Tech. (Second Year) Prog. Code: 128/129"}
               </h2>
               <div className="grid grid-cols-4 gap-4 mt-4 text-md">
                 <div className="flex justify-between items-center gap-4">
@@ -616,14 +616,17 @@ export default function FacultyPortal() {
                 {studentData.programmeName}
               </div>
             </div>
-            {/* Stream */}
+            {/* Programme Code */}
             <div className="w-full flex justify-center items-center">
-              <label htmlFor="stream" className="text-md w-1/3 font-semibold">
-                {"Stream *"}
+              <label
+                htmlFor="programme_code"
+                className="text-md w-1/3 font-semibold"
+              >
+                {"Programme Code *"}
               </label>
               <div
-                name="stream"
-                id="stream"
+                name="programme_code"
+                id="programme_code"
                 className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
               >
                 {studentData.stream}
@@ -1313,7 +1316,7 @@ export default function FacultyPortal() {
                     className="w-2/3 text-left text-md font-medium"
                   >
                     {
-                      "Attached 12th Marksheet & Passing Certificate Google Drive Link (Anyone with the link)."
+                      "Attached 12th Marksheet & Passing Certificate (Both sides - Front & Back) Google Drive Link (Anyone with the link)."
                     }{" "}
                   </label>
                   {studentData.marksheet_12 ? (
@@ -1454,7 +1457,7 @@ export default function FacultyPortal() {
                 </div>
 
                 <h2 className="text-md font-medium my-2 underline underline-offset-2">
-                  {"Aggregate"}
+                  {"Aggregate (Total of all 3 years)"}
                 </h2>
                 <div className="w-[75%] flex justify-center gap-6 items-center">
                   {/* Total Marks, Marks Obtained and Percentage Aggregate */}
@@ -1510,9 +1513,9 @@ export default function FacultyPortal() {
             <div className="flex flex-col items-start gap-4 text-md font-medium text-center mb-4 bg-purple-100 border-2 border-red-600 rounded-md w-[90%] px-6 py-6">
               <p>
                 {"* Deposit"}{" "}
-                <span className="font-bold">{" Rs. 5000/- "}</span>{" "}
+                <span className="font-bold">{" Rs. 10,000/- "}</span>{" "}
                 {
-                  "as registration charges (Non-Refundable) to MSIT, either through NEFT/RTGS."
+                  "as registration and processing fees (Non-Refundable) to MSIT, either through NEFT/RTGS."
                 }
               </p>
               <h2 className="text-md font-bold underline underline-offset-2">

@@ -279,11 +279,12 @@ export default function StudentRegisterPortal() {
 
   const streamOptions = useMemo(
     () => [
-      { value: "", label: "Select Stream" },
-      { value: "CSE", label: "CSE" },
-      { value: "IT", label: "IT" },
-      { value: "ECE", label: "ECE" },
-      { value: "EEE", label: "EEE" },
+      { value: "", label: "Select Programme Code" },
+      { value: "B.Tech (First Year): 131", label: "B.Tech (First Year): 131" },
+      {
+        value: "L.E to B.Tech (Second Year): 128/129",
+        label: "L.E to B.Tech (Second Year): 128/129",
+      },
     ],
     []
   );
@@ -549,7 +550,7 @@ export default function StudentRegisterPortal() {
               </p>
               <div className="w-full flex flex-col items-start">
                 <h2 className="underline underline-offset-4">
-                  {"B.Tech. (First Year)"}
+                  {"B.Tech. (First Year) Prog. Code: 131"}
                 </h2>
                 <div className="grid grid-cols-4 gap-4 mt-4 text-md">
                   <div className="flex justify-between items-center gap-4">
@@ -619,7 +620,7 @@ export default function StudentRegisterPortal() {
               </div>
               <div className="w-full flex flex-col items-start">
                 <h2 className="underline underline-offset-4">
-                  {"LE to B.Tech. (Second Year)"}
+                  {"LE to B.Tech. (Second Year) Prog. Code: 128/129"}
                 </h2>
                 <div className="grid grid-cols-4 gap-4 mt-4 text-md">
                   <div className="flex justify-between items-center gap-4">
@@ -718,17 +719,17 @@ export default function StudentRegisterPortal() {
                     ))}
                   </select>
                 </div>
-                {/* Stream */}
+                {/* Programme Code */}
                 <div className="w-full flex justify-center items-center">
                   <label
-                    htmlFor="stream"
+                    htmlFor="programme_code"
                     className="text-md w-1/3 font-semibold"
                   >
-                    {"Stream *"}
+                    {"Programme Code *"}
                   </label>
                   <select
-                    name="stream"
-                    id="stream"
+                    name="programme_code"
+                    id="programme_code"
                     className="py-1 px-3 w-1/3 border-2 rounded-md border-gray-400 outline-none text-md"
                     onChange={handleStreamSelect}
                     value={stream}
@@ -1815,7 +1816,9 @@ export default function StudentRegisterPortal() {
                         htmlFor="12th_marksheet_upload"
                         className="w-2/3 text-left text-md font-medium"
                       >
-                        {"Please attach 12th Marksheet & Passing Certificate."}{" "}
+                        {
+                          "Please attach 12th Marksheet & Passing Certificate (Both sides - Front & Back)."
+                        }{" "}
                       </label>
                       <input
                         type="text"
@@ -2045,7 +2048,7 @@ export default function StudentRegisterPortal() {
 
                   {/* Aggregate */}
                   <h2 className="text-md font-medium my-2 underline underline-offset-2">
-                    {"Aggregate"}
+                    {"Aggregate (Total of all 3 years)"}
                   </h2>
                   <div className="w-[75%] flex justify-center gap-6 items-center">
                     {/* Total Marks, Marks Obtained and Percentage Aggregate */}
@@ -2120,11 +2123,12 @@ export default function StudentRegisterPortal() {
               {/* Payment Component */}
               <div className="w-full flex flex-col justify-center items-center gap-6">
                 <div className="flex flex-col items-start gap-4 text-md font-medium text-center mb-4 bg-purple-100 border-2 border-red-600 rounded-md w-[90%] px-6 py-6">
-                  <p>
-                    {"* Deposit"}{" "}
-                    <span className="font-bold">{" Rs. 5000/- "}</span>{" "}
+                  <p className="text-left">
+                    {"* Deposit"}
+                    {""}
+                    <span className="font-bold">{" Rs. 10,000/- "}</span>{" "}
                     {
-                      "as registration charges (Non-Refundable) to MSIT, either through NEFT/RTGS."
+                      "as registration and processing fees (Non-Refundable) to MSIT, either through NEFT/RTGS."
                     }
                   </p>
                   <h2 className="text-md font-bold underline underline-offset-2">
@@ -2288,14 +2292,6 @@ export default function StudentRegisterPortal() {
                   className=" text-green-600 hover:text-green-700 active:text-green-600"
                 >
                   {"www.msit.in"}
-                </Link>{" "}
-                {" or visit "}{" "}
-                <Link
-                  href={"https://www.ipu.ac.in"}
-                  target="_blank"
-                  className=" text-green-600 hover:text-green-700 active:text-green-600"
-                >
-                  {"www.ipu.ac.in"}
                 </Link>
               </p>
 
