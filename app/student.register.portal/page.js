@@ -123,7 +123,7 @@ export default function StudentRegisterPortal() {
         };
 
         const request = await axios.post(
-          "https://backend-management-0xpn.onrender.com/submit-form",
+          "https://backend-management-ynz9.onrender.com/submit-form",
           formData
         );
 

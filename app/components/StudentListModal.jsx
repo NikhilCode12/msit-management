@@ -13,7 +13,7 @@ const StudentListModal = ({ onSelect, onClose }) => {
     setError(null);
     try {
       const response = await fetch(
-        "https://backend-management-0xpn.onrender.com/student/all",
+        "https://backend-management-ynz9.onrender.com/student/all",
         {
           headers: {
             "Cache-Control": "no-cache",
